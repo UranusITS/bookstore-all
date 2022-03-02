@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "kotlin-antd": "^3.20.3-pre.2"
+  }
+}
