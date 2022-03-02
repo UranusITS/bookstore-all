@@ -1,5 +1,6 @@
 package page
 
+import antd.input.search
 import react.Props
 import react.RComponent
 import react.State
@@ -8,10 +9,10 @@ import component.BookList
 import data.Book
 import kotlinext.js.require
 import antd.layout.*
+import component.Header
 import component.SaleCarousel
 import kotlinext.js.js
-import kotlinx.html.style
-import react.dom.img
+import react.dom.a
 import react.dom.p
 
 
@@ -64,22 +65,25 @@ class Homepage (props: HomepageProps) : RComponent<HomepageProps, HomepageState>
 
     override fun RBuilder.render() {
         layout {
-            header {
-                img {
-                    attrs.src = "assets/logo.svg"
-                    attrs.style = js { height = 48 }
-                }
-                img {
-                    attrs.src = "assets/logo-name.svg"
-                    attrs.style = js {
-                        height = 48
-                        filter = "invert(100%)" }
+            child(Header::class) {
+                attrs {
+                    id = 100
+                    name = "Uranus"
                 }
             }
             content {
                 attrs.style = js {
-                    width = 1000
+                    width = 1080
                     margin = "0 auto"
+                }
+                search {
+                    attrs {
+                        style = js { marginTop = 24 }
+                        placeholder = "输入书名，作者名，......"
+                        enterButton = true
+                        size = "large"
+                        onSearch = { value, _ -> console.log(value) }
+                    }
                 }
                 child(SaleCarousel::class) {
                     attrs.sales = defaultSales
@@ -89,12 +93,29 @@ class Homepage (props: HomepageProps) : RComponent<HomepageProps, HomepageState>
                 }
             }
             footer {
-                attrs.style = js{ textAlign = "center" }
-                p {
-                    +"Designed by Uranus"
+                attrs.style = js{
+                    textAlign = "center"
+                    background = "white"
                 }
                 p {
-                    +"With Kotlin and Ant Design"
+                    +"Designed by "
+                    a {
+                        attrs.href = "https://github.com/UranusITS"
+                        +"Uranus"
+                    }
+                }
+                p {
+                    +"With "
+                    a {
+                        attrs.href = "https://kotlinlang.org/"
+                        +"Kotlin"
+                    }
+                    +" & "
+                    a {
+                        attrs.href = "https://ant.design/"
+                        +"Ant Design"
+                    }
+                    +" & ❤"
                 }
             }
         }

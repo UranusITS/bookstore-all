@@ -5,10 +5,10 @@ import styled.StyleSheet
 
 object BookItemStyles:StyleSheet(name = "BookItemStyles", isStatic = true) {
     val frame by css {
-        marginTop = 18.px
-        marginBottom = 18.px
-        marginLeft = 18.px
-        marginRight = 18.px
+        marginTop = 12.px
+        marginBottom = 12.px
+        marginLeft = 12.px
+        marginRight = 12.px
     }
     val price by css {
         color = Color.red
