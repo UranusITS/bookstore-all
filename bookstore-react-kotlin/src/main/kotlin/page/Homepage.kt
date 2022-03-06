@@ -1,19 +1,17 @@
 package page
 
 import antd.input.search
-import react.Props
-import react.RComponent
-import react.State
-import react.RBuilder
 import component.BookList
 import data.Book
-import kotlinext.js.require
 import antd.layout.*
 import component.Header
 import component.SaleCarousel
 import kotlinext.js.js
+import react.Props
 import react.dom.a
+import react.dom.div
 import react.dom.p
+import react.fc
 
 
 val defaultBooks = listOf(
@@ -52,23 +50,17 @@ val defaultSales = listOf("assets/carousel/book1.jpg", "assets/carousel/book2.jp
                           "assets/carousel/book3.jpg", "assets/carousel/book4.jpg")
 
 external interface HomepageProps : Props {
+    var id: Int
     var name: String
 }
 
-data class HomepageState(val name: String) : State
-
-class Homepage (props: HomepageProps) : RComponent<HomepageProps, HomepageState>(props) {
-    init {
-        require("antd/dist/antd.css")
-        state = HomepageState(props.name)
-    }
-
-    override fun RBuilder.render() {
+val homepage = fc<HomepageProps> { props ->
+    div {
         layout {
             child(Header::class) {
                 attrs {
-                    id = 100
-                    name = "Uranus"
+                    id = props.id
+                    name = props.name
                 }
             }
             content {
