@@ -3,8 +3,12 @@ on: [ push, pull_request ]
 jobs:
   build:
     name: Test and Build
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
+
+      # Install rsync required by step Deploy
+      - name: Install rsync
+        run: apt-get update && apt-get install -y rsync
 
       # Setup Java 1.8 environment for the next steps
       - name: Setup Java
@@ -23,7 +27,7 @@ jobs:
       # If main branch update, deploy to gh-pages
       - name: Deploy
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@4.2.5
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
