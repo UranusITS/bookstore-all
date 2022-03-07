@@ -8,7 +8,7 @@ jobs:
 
       # Install rsync required by step Deploy
       - name: Install rsync
-        run: apt-get update && apt-get install -y rsync
+        run: sudo apt-get update && apt-get install -y rsync
 
       # Setup Java 1.8 environment for the next steps
       - name: Setup Java
