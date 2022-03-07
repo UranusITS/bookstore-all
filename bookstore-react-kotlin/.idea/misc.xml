@@ -10,4 +10,8 @@
   <component name="ProjectType">
     <option name="id" value="jpab" />
   </component>
+  <component name="WebPackConfiguration">
+    <option name="mode" value="AUTO" />
+    <option name="path" value="$PROJECT_DIR$/webpack.config.js" />
+  </component>
 </project>

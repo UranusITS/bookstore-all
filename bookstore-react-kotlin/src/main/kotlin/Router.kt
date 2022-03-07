@@ -5,11 +5,11 @@ import page.homepage
 import react.*
 import react.router.Route
 import react.router.Routes
-import react.router.dom.BrowserRouter
+import react.router.dom.HashRouter
 
 class BasicRoute(props: Props): RComponent<Props, State>(props) {
     override fun RBuilder.render() {
-        BrowserRouter {
+        HashRouter {
             Routes {
                 Route {
                     attrs.index = true
