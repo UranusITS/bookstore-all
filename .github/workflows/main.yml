@@ -22,7 +22,7 @@ jobs:
 
       # Build application
       - name: Test and Build
-        run: sudo ./bookstore-react-kotlin/gradlew build -p ./bookstore-react-kotlin/
+        run: sudo sh ./bookstore-react-kotlin/gradlew build -p ./bookstore-react-kotlin/
 
       # If main branch update, deploy to gh-pages
       - name: Deploy
