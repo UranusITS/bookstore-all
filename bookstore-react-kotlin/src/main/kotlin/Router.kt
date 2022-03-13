@@ -1,3 +1,7 @@
+import component.BookItem
+import history.HashHistory
+import history.History
+import history.createHashHistory
 import kotlinext.js.js
 import page.HomepageProps
 import page.bookPage
@@ -16,8 +20,11 @@ class BasicRoute(props: Props): RComponent<Props, State>(props) {
                     attrs.element = createElement(homepage, js { id = 100 ;name = "Uranus" })
                 }
                 Route {
-                    attrs.path = "/book"
+                    attrs.path = "book"
                     attrs.element = createElement(bookPage)
+                    Route {
+                        attrs.path = ":bookId"
+                    }
                 }
             }
         }

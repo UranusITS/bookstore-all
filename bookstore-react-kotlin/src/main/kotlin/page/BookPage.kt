@@ -1,23 +1,21 @@
 package page
 
-import antd.input.search
-import component.BookList
 import antd.layout.*
+import component.BookDetail
+import component.Footer
 import component.Header
-import component.SaleCarousel
 import kotlinext.js.js
-import react.Props
-import react.dom.a
 import react.dom.div
-import react.dom.p
 import react.fc
 import data.BookProps
-import data.BookState
-import react.useState
+import react.router.useParams
 
 val bookPage = fc<BookProps> { props ->
+    val params = useParams()
+    val bookId = params["bookId"]?.toInt()
     div {
         layout {
+            attrs.style = js { minHeight = "100vh" }
             child(Header::class) {
                 attrs {
                     id = 100
@@ -29,36 +27,29 @@ val bookPage = fc<BookProps> { props ->
                     width = 1080
                     margin = "0 auto"
                 }
-                p {
-                    +"//UNDER CONSTRUCTION//"
+                child(BookDetail::class) {
+                    if(bookId == null) { }
+                    else {
+                        val book = defaultBookList.getById(bookId)
+                        if (book != null) {
+                            attrs {
+                                id = book.id
+                                isbn = book.isbn
+                                name = book.name
+                                type = book.type
+                                author = book.author
+                                price = book.price
+                                description = book.description
+                                inventory = book.inventory
+                                imgPath = book.imgPath
+                            }
+                        } else {
+                            console.log("Book is null for id $bookId")
+                        }
+                    }
                 }
             }
-            footer {
-                attrs.style = kotlinext.js.js{
-                    textAlign = "center"
-                    background = "white"
-                }
-                p {
-                    +"Designed by "
-                    a {
-                        attrs.href = "https://github.com/UranusITS"
-                        +"Uranus"
-                    }
-                }
-                p {
-                    +"With "
-                    a {
-                        attrs.href = "https://kotlinlang.org/"
-                        +"Kotlin"
-                    }
-                    +" & "
-                    a {
-                        attrs.href = "https://ant.design/"
-                        +"Ant Design"
-                    }
-                    +" & ❤"
-                }
-            }
+            Footer { }
         }
     }
 }

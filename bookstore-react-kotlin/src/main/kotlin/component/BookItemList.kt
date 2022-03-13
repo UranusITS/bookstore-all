@@ -7,20 +7,47 @@ import antd.grid.row
 
 
 external interface BookListProps : Props {
-    var books: List<Book>
+    var bookList: BookList
 }
 
-data class BookListState(val books: List<Book>) : State
-
-class BookList (props: BookListProps) : RComponent<BookListProps, BookListState>(props) {
-    init {
-        state = BookListState(props.books)
+class BookList(_books: MutableList<Book>) {
+    var books: MutableList<Book> = _books
+    fun getById(id: Int): Book? {
+        for (book in books) {
+            if (book.id == id)
+                return book
+        }
+        return null
     }
+    fun getByName(name: String): Book? {
+        for (book in books) {
+            if (book.name == name)
+                return book
+        }
+        return null
+    }
+    fun getBySearchContent(str: String): BookList {
+        val re = mutableListOf<Book>()
+        for (book in books) {
+            if (book.toString().indexOf(str) != -1) {
+                re.add(book)
+            }
+        }
+        return BookList(re)
+    }
+    fun addBook(book: Book) {
+        if (getById(book.id) != null) {
+            books.add(book)
+        }
+    }
+}
 
+class BookListComponent (props: BookListProps) : RComponent<BookListProps, State>(props) {
+    private val bookList = props.bookList
     override fun RBuilder.render() {
         row {
             attrs.gutter = 24
-            for (book in state.books) {
+            for (book in bookList.books) {
                 col {
                     attrs.span = 6
                     child(BookItem::class) {

@@ -1,20 +1,16 @@
 package page
 
 import antd.input.search
-import component.BookList
 import data.Book
 import antd.layout.*
-import component.Header
-import component.SaleCarousel
+import component.*
 import kotlinext.js.js
 import react.Props
-import react.dom.a
 import react.dom.div
-import react.dom.p
 import react.fc
 
 
-val defaultBooks = listOf(
+val defaultBookList = BookList(mutableListOf(
     Book(1, "1", "Java核心技术卷II", "编程", "凯S.霍斯特曼", 95.20, "本书是Java领域有影响力和价值的著作之一，由拥有20多年教学与研究经验的Java技术专家撰写（获Jolt大奖），与《Java编程思想》齐名，10余年全球畅销不衰，广受好评。第10版根据JavaSE8全面更新，同时修正了第9版中的不足，系统全面讲解了Java语言的核心概念、语法、重要特性和开发方法，包含大量案例，实践性强。", 1000, "http://img3m9.ddimg.cn/12/36/1546133799-1_w_1.jpg"),
     Book(2, "2", "深入理解计算机系统", "编程", "兰德尔·E·布莱恩特", 136.90, "程序员必读经典著作！理解计算机系统*书目，10万程序员共同选择。第二版销售突破100000册，第三版重磅上市！", 1200, "http://img3m7.ddimg.cn/48/0/24106647-1_w_6.jpg"),
     Book(3, "3", "Effective C++", "编程", "梅耶", 51.30, "大师名著纵横二十载，稳居任一荐书单三甲；称职程序员傍身绝学，通向C++精微奥妙之门。", 1000, "http://img3m6.ddimg.cn/96/25/21000966-1_u_12.jpg"),
@@ -44,7 +40,7 @@ val defaultBooks = listOf(
     Book(27, "27", "楚留香传奇(全三册)", "武侠小说", "古龙", 224.50, "《楚留香传奇》无疑乃古龙诸作中*为烩炙人口之作，此作固成就古龙之盛名，更成为武侠文学之重要里程碑。楚留香 有西方007罗杰摩尔之冷静、优雅、明快及幽默，更因他没有复仇及情爱之纠葛（例如他从来不杀人）而超越007，颇有“本来无一物，何处惹尘埃”的意境。", 551, "http://img3m4.ddimg.cn/4/22/1592963464-1_w_1.jpg"),
     Book(28, "28", "哈利波特与魔法石", "魔幻小说", "J·K·罗琳", 30.20, "“沉湎于虚幻的梦想，而忘记现实的生活，这是毫无益处的，千万记住。”                                ——阿不 思·邓布利多", 1000, "http://img3m1.ddimg.cn/88/0/25479421-1_w_1.jpg"),
     Book(29, "29", "哈利·波特与死亡圣器", "魔幻小说", "J·K·罗琳", 56.20, "两个人不能都活着，只有一个生存下来，我们中的一个将要永远离开……", 1551, "http://img3m4.ddimg.cn/71/20/25479404-1_w_1.jpg")
-)
+))
 
 val defaultSales = listOf("assets/carousel/book1.jpg", "assets/carousel/book2.jpg",
                           "assets/carousel/book3.jpg", "assets/carousel/book4.jpg")
@@ -77,39 +73,10 @@ val homepage = fc<HomepageProps> { props ->
                         onSearch = { value, _ -> console.log(value) }
                     }
                 }
-                child(SaleCarousel::class) {
-                    attrs.sales = defaultSales
-                }
-                child(BookList::class) {
-                    attrs.books = defaultBooks
-                }
+                child(SaleCarousel::class) { attrs.sales = defaultSales }
+                child(BookListComponent::class) { attrs.bookList = defaultBookList }
             }
-            footer {
-                attrs.style = js{
-                    textAlign = "center"
-                    background = "white"
-                }
-                p {
-                    +"Designed by "
-                    a {
-                        attrs.href = "https://github.com/UranusITS"
-                        +"Uranus"
-                    }
-                }
-                p {
-                    +"With "
-                    a {
-                        attrs.href = "https://kotlinlang.org/"
-                        +"Kotlin"
-                    }
-                    +" & "
-                    a {
-                        attrs.href = "https://ant.design/"
-                        +"Ant Design"
-                    }
-                    +" & ❤"
-                }
-            }
+            Footer { }
         }
     }
 }

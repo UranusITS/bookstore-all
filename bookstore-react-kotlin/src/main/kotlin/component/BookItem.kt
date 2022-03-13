@@ -7,6 +7,8 @@ import antd.card.cardMeta
 import kotlinext.js.js
 import react.RBuilder
 import data.*
+import history.History
+import history.createHashHistory
 import react.router.dom.Link
 import react.router.useHref
 import styled.css
@@ -23,7 +25,7 @@ class BookItem (props: BookProps) : RComponent<BookProps, BookState>(props) {
         styledDiv {
             css { +BookItemStyles.frame }
             Link {
-                attrs.to = "/book"
+                attrs.to = "/book/${props.id}"
                 attrs.state = state
                 card {
                     attrs {
