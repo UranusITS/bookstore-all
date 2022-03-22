@@ -16,52 +16,44 @@ import styled.styledDiv
 import styled.styledP
 
 
-class BookItem (props: BookProps) : RComponent<BookProps, BookState>(props) {
-    init {
-        state = BookState(props)
-    }
-
-    override fun RBuilder.render() {
-        styledDiv {
-            css { +BookItemStyles.frame }
-            Link {
-                attrs.to = "/book/${props.id}"
-                attrs.state = state
-                card {
-                    attrs {
-                        hoverable = true
-                        bordered = false
-                        style = js {
-                            width = 240
-                            paddingTop = 24
-                            margin = "0 auto"
-                        }
-                        cover = buildElement {
-                            img {
-                                attrs {
-                                    alt = state.book.name
-                                    src = state.book.imgPath
-                                }
+val BookItem = fc<BookProps> { props ->
+    styledDiv {
+        css { +BookItemStyles.frame }
+        Link {
+            attrs.to = "/book/${props.id}"
+            card {
+                attrs {
+                    hoverable = true
+                    bordered = false
+                    style = js {
+                        width = 240
+                        paddingTop = 24
+                        margin = "0 auto"
+                    }
+                    cover = buildElement {
+                        img {
+                            attrs {
+                                alt = props.name
+                                src = props.imgPath
                             }
                         }
                     }
-                    cardMeta {
-                        attrs {
-                            title = state.book.name
-                            description = state.book.author
-                        }
+                }
+                cardMeta {
+                    attrs {
+                        title = props.name
+                        description = props.author
                     }
-                    styledP {
-                        css { +BookItemStyles.price }
-                        +"￥${state.book.price}"
-                    }
-                    styledP {
-                        css { +BookItemStyles.inventory }
-                        +"库存剩余${state.book.inventory}件"
-                    }
+                }
+                styledP {
+                    css { +BookItemStyles.price }
+                    +"￥${props.price}"
+                }
+                styledP {
+                    css { +BookItemStyles.inventory }
+                    +"库存剩余${props.inventory}件"
                 }
             }
         }
     }
 }
-

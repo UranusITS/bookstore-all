@@ -1,9 +1,5 @@
-import component.BookItem
-import history.HashHistory
-import history.History
-import history.createHashHistory
 import kotlinext.js.js
-import page.HomepageProps
+import kotlinx.browser.localStorage
 import page.bookPage
 import page.homepage
 import react.*

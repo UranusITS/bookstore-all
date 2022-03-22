@@ -1,10 +1,9 @@
 package component
 
 import antd.carousel.carousel
-import react.Props
-import react.RBuilder
-import react.RComponent
-import react.State
+import data.BookProps
+import data.UserProps
+import react.*
 import react.dom.div
 import react.dom.img
 import styled.css
@@ -14,23 +13,15 @@ external interface SaleCarouselProps : Props {
     var sales: List<String>
 }
 
-data class SaleCarouselState(val sales: List<String>) : State
-
-class SaleCarousel (props: SaleCarouselProps) : RComponent<SaleCarouselProps, SaleCarouselState>(props) {
-    init {
-        state = SaleCarouselState(props.sales)
-    }
-
-    override fun RBuilder.render() {
-        styledDiv {
-            css { +SaleCarouselStyles.main }
-            carousel {
-                attrs.autoplay = true
-                attrs.dotPosition = "Bottom"
-                for (sale in state.sales) {
-                    div {
-                        img { attrs.src = sale }
-                    }
+val SaleCarousel = fc<SaleCarouselProps> { props ->
+    styledDiv {
+        css { +SaleCarouselStyles.main }
+        carousel {
+            attrs.autoplay = true
+            attrs.dotPosition = "Bottom"
+            for (sale in props.sales) {
+                div {
+                    img { attrs.src = sale }
                 }
             }
         }

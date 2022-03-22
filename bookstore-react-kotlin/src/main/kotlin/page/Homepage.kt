@@ -1,11 +1,9 @@
 package page
 
-import antd.input.search
 import data.Book
 import antd.layout.*
 import component.*
-import kotlinext.js.js
-import react.Props
+import data.UserProps
 import react.dom.div
 import react.fc
 
@@ -45,12 +43,7 @@ val defaultBookList = BookList(mutableListOf(
 val defaultSales = listOf("assets/carousel/book1.jpg", "assets/carousel/book2.jpg",
                           "assets/carousel/book3.jpg", "assets/carousel/book4.jpg")
 
-external interface HomepageProps : Props {
-    var id: Int
-    var name: String
-}
-
-val homepage = fc<HomepageProps> { props ->
+val homepage = fc<UserProps> { props ->
     div {
         layout {
             child(Header::class) {
@@ -59,23 +52,7 @@ val homepage = fc<HomepageProps> { props ->
                     name = props.name
                 }
             }
-            content {
-                attrs.style = js {
-                    width = 1080
-                    margin = "0 auto"
-                }
-                search {
-                    attrs {
-                        style = js { marginTop = 24 }
-                        placeholder = "输入书名，作者名，......"
-                        enterButton = true
-                        size = "large"
-                        onSearch = { value, _ -> console.log(value) }
-                    }
-                }
-                child(SaleCarousel::class) { attrs.sales = defaultSales }
-                child(BookListComponent::class) { attrs.bookList = defaultBookList }
-            }
+            child(BookListComponent::class) { attrs.bookList = defaultBookList }
             Footer { }
         }
     }

@@ -11,8 +11,3 @@ external interface UserProps : Props {
     var id: Int
     var name: String
 }
-
-data class UserState(val user: User) : State {
-    constructor(props: UserProps) :
-            this(User(props))
-}
