@@ -1,7 +1,7 @@
 package component
 
 import antd.carousel.carousel
-import component.style.SaleCarouselStyles
+import style.SaleCarouselStyles
 import data.SaleCarouselProps
 import react.dom.div
 import react.dom.img

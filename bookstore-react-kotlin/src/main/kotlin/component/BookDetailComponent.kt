@@ -8,15 +8,22 @@ import antd.grid.row
 import antd.icon.payCircleOutlined
 import antd.icon.shoppingCartOutlined
 import antd.icon.starOutlined
-import component.style.BookDetailStyles
+import antd.message.message
+import style.BookDetailStyles
+import data.Book
 import data.BookProps
+import data.SettlementState
 import kotlinext.js.js
+import kotlinx.browser.localStorage
 import kotlinx.css.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import react.fc
 import styled.css
 import styled.styledDiv
 import styled.styledImg
 import styled.styledSpan
+import kotlinx.serialization.json.Json
 
 
 val BookDetailComponent = fc<BookProps> { props ->
@@ -84,12 +91,44 @@ val BookDetailComponent = fc<BookProps> { props ->
                     styledDiv {
                         css { +BookDetailStyles.button }
                         button {
-                            attrs.style = js {
-                                width = 160.px
-                                margin = "0 auto"
+                            attrs {
+                                style = js {
+                                    width = 160.px
+                                    margin = "0 auto"
+                                }
+                                type = "primary"
+                                size = "large"
+                                onClick = {
+                                    val storageSettlement = localStorage.getItem("settlement")
+                                    console.log(storageSettlement)
+                                    if (storageSettlement != null) {
+                                        val books = Json.decodeFromString<SettlementState>(storageSettlement)
+                                        val newBooks = books.books.toMutableList()
+                                        var foundFlag = false
+                                        for (book in newBooks)
+                                            if (book.first.id == props.id) {
+                                                foundFlag = true
+                                                break
+                                            }
+                                        if (!foundFlag) {
+                                            val book = Book(props.id, props.isbn, props.name, props.type, props.author,
+                                                props.price, props.description, props.inventory, props.imgPath)
+                                            newBooks.add(Pair(book, 1))
+                                            localStorage.setItem("settlement", Json.encodeToString(SettlementState(newBooks)))
+                                            message.success("加入购物车成功")
+                                        }
+                                        else {
+                                            message.info("已在购物车中")
+                                        }
+                                    }
+                                    else {
+                                        val book = Book(props.id, props.isbn, props.name, props.type, props.author,
+                                            props.price, props.description, props.inventory, props.imgPath)
+                                        localStorage.setItem("settlement", Json.encodeToString(SettlementState(listOf(Pair(book, 1)))))
+                                        message.success("加入购物车成功")
+                                    }
+                                }
                             }
-                            attrs.type = "primary"
-                            attrs.size = "large"
                             shoppingCartOutlined { }
                             +"加入购物车"
                         }

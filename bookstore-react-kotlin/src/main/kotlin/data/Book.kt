@@ -1,8 +1,10 @@
 package data
 
 import react.Props
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class Book(val id: Int, val isbn: String, val name: String, val type: String, val author: String,
                 val price: Double, val description: String, val inventory: Int, val imgPath: String)
 {

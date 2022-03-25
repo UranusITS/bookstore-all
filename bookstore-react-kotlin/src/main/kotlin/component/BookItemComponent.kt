@@ -2,7 +2,7 @@ package component
 
 import antd.card.card
 import antd.card.cardMeta
-import component.style.BookItemStyles
+import style.BookItemStyles
 import data.BookProps
 import kotlinext.js.js
 import react.buildElement

@@ -3,7 +3,7 @@ package page
 import antd.layout.content
 import antd.layout.layout
 import component.*
-import component.style.BookDetailStyles
+import style.BookDetailStyles
 import data.BookProps
 import kotlinext.js.js
 import react.dom.div
@@ -15,7 +15,6 @@ import styled.styledDiv
 val bookPage = fc<BookProps> { props ->
     val params = useParams()
     val bookId = params["bookId"]?.toInt()
-    console.log(bookId)
     div {
         layout {
             attrs.style = js { minHeight = "100vh" }
@@ -32,7 +31,6 @@ val bookPage = fc<BookProps> { props ->
                         }
                     } else {
                         val book = defaultBookList.getById(bookId)
-                        console.log(book)
                         if (book != null) {
                             BookDetailComponent {
                                 attrs {

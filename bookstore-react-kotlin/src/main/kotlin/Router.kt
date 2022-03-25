@@ -1,3 +1,4 @@
+import kotlinx.browser.localStorage
 import page.bookPage
 import page.homePage
 import page.settlementPage
