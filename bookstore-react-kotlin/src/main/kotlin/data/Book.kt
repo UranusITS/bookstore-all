@@ -1,6 +1,6 @@
 package data
 
-import react.*
+import react.Props
 
 
 data class Book(val id: Int, val isbn: String, val name: String, val type: String, val author: String,
@@ -21,10 +21,4 @@ external interface BookProps : Props {
     var description: String
     var inventory: Int
     var imgPath: String
-}
-
-data class BookState(val book: Book) : State
-{
-    constructor(props: BookProps) :
-            this(Book(props))
 }

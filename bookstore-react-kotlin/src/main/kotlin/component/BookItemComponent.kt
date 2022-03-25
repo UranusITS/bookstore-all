@@ -1,22 +1,21 @@
 package component
 
-import react.*
-import react.dom.*
 import antd.card.card
 import antd.card.cardMeta
+import component.style.BookItemStyles
+import data.BookProps
 import kotlinext.js.js
-import react.RBuilder
-import data.*
-import history.History
-import history.createHashHistory
+import react.buildElement
+import react.dom.attrs
+import react.dom.img
+import react.fc
 import react.router.dom.Link
-import react.router.useHref
 import styled.css
 import styled.styledDiv
 import styled.styledP
 
 
-val BookItem = fc<BookProps> { props ->
+val BookItemComponent = fc<BookProps> { props ->
     styledDiv {
         css { +BookItemStyles.frame }
         Link {

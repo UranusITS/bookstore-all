@@ -1,55 +1,64 @@
 package page
 
-import antd.layout.*
-import component.BookDetail
-import component.Footer
-import component.Header
+import antd.layout.content
+import antd.layout.layout
+import component.*
+import component.style.BookDetailStyles
+import data.BookProps
 import kotlinext.js.js
 import react.dom.div
 import react.fc
-import data.BookProps
 import react.router.useParams
+import styled.css
+import styled.styledDiv
 
 val bookPage = fc<BookProps> { props ->
     val params = useParams()
     val bookId = params["bookId"]?.toInt()
+    console.log(bookId)
     div {
         layout {
             attrs.style = js { minHeight = "100vh" }
-            child(Header::class) {
-                attrs {
-                    id = 100
-                    name = "Uranus"
-                }
-            }
+            child(HeaderComponent::class) { }
             content {
-                attrs.style = js {
-                    width = 1080
-                    margin = "0 auto"
-                }
-                child(BookDetail::class) {
-                    if(bookId == null) { }
-                    else {
-                        val book = defaultBookList.getById(bookId)
-                        if (book != null) {
+                styledDiv {
+                    css { +BookDetailStyles.frame }
+                    if (bookId == null) {
+                        errorComponent {
                             attrs {
-                                id = book.id
-                                isbn = book.isbn
-                                name = book.name
-                                type = book.type
-                                author = book.author
-                                price = book.price
-                                description = book.description
-                                inventory = book.inventory
-                                imgPath = book.imgPath
+                                errorCode = 404
+                                extraInfo = "请给出bookId"
+                            }
+                        }
+                    } else {
+                        val book = defaultBookList.getById(bookId)
+                        console.log(book)
+                        if (book != null) {
+                            BookDetailComponent {
+                                attrs {
+                                    id = book.id
+                                    isbn = book.isbn
+                                    name = book.name
+                                    type = book.type
+                                    author = book.author
+                                    price = book.price
+                                    description = book.description
+                                    inventory = book.inventory
+                                    imgPath = book.imgPath
+                                }
                             }
                         } else {
-                            console.log("Book is null for id $bookId")
+                            errorComponent {
+                                attrs {
+                                    errorCode = 404
+                                    extraInfo = "未找到图书"
+                                }
+                            }
                         }
                     }
                 }
             }
-            Footer { }
+            FooterComponent { }
         }
     }
 }

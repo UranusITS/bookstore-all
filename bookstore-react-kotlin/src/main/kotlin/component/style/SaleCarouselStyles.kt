@@ -1,4 +1,4 @@
-package component
+package component.style
 
 import kotlinx.css.*
 import styled.StyleSheet

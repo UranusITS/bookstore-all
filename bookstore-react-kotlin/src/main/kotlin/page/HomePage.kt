@@ -1,9 +1,12 @@
 package page
 
+import antd.layout.layout
+import data.BookList
+import component.BookListComponent
+import component.FooterComponent
+import component.HeaderComponent
 import data.Book
-import antd.layout.*
-import component.*
-import data.UserProps
+import react.Props
 import react.dom.div
 import react.fc
 
@@ -43,17 +46,17 @@ val defaultBookList = BookList(mutableListOf(
 val defaultSales = listOf("assets/carousel/book1.jpg", "assets/carousel/book2.jpg",
                           "assets/carousel/book3.jpg", "assets/carousel/book4.jpg")
 
-val homepage = fc<UserProps> { props ->
+val homePage = fc<Props> {
     div {
         layout {
-            child(Header::class) {
+            child(HeaderComponent::class) { }
+            child(BookListComponent::class) {
                 attrs {
-                    id = props.id
-                    name = props.name
+                    bookList = defaultBookList
+                    sales = defaultSales
                 }
             }
-            child(BookListComponent::class) { attrs.bookList = defaultBookList }
-            Footer { }
+            FooterComponent { }
         }
     }
 }

@@ -1,6 +1,6 @@
 package data
 
-import react.*
+import react.Props
 
 
 data class User(val id: Int, val name: String) {

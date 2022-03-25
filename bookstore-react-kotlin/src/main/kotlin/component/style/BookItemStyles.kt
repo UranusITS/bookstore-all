@@ -1,12 +1,11 @@
-package component
+package component.style
 
 import kotlinx.css.*
 import styled.StyleSheet
 
 object BookItemStyles:StyleSheet(name = "BookItemStyles", isStatic = true) {
     val frame by css {
-        marginTop = 12.px
-        marginBottom = 12.px
+        marginBottom = 24.px
         marginLeft = 12.px
         marginRight = 12.px
     }

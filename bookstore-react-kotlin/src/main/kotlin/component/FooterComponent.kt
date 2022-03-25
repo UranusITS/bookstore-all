@@ -1,12 +1,12 @@
 package component
 
 import antd.layout.footer
-import data.*
-import react.*
+import react.Props
 import react.dom.a
 import react.dom.p
+import react.fc
 
-val Footer = fc<Props> {
+val FooterComponent = fc<Props> {
     footer {
         attrs.style = kotlinext.js.js{
             textAlign = "center"

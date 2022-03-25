@@ -1,17 +1,14 @@
 package component
 
 import antd.carousel.carousel
-import data.BookProps
-import data.UserProps
-import react.*
+import component.style.SaleCarouselStyles
+import data.SaleCarouselProps
 import react.dom.div
 import react.dom.img
+import react.fc
 import styled.css
 import styled.styledDiv
 
-external interface SaleCarouselProps : Props {
-    var sales: List<String>
-}
 
 val SaleCarousel = fc<SaleCarouselProps> { props ->
     styledDiv {

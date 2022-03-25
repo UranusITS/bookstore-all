@@ -4,27 +4,27 @@ import antd.ChangeEventHandler
 import antd.button.button
 import antd.dropdown.dropdown
 import antd.icon.*
+import antd.input.input
+import antd.input.password
 import antd.layout.header
 import antd.menu.menu
 import antd.menu.menuItem
 import antd.modal.modal
-import antd.input.input
-import antd.input.password
 import antd.space.space
+import data.HeaderState
+import data.User
+import kotlinext.js.js
+import kotlinx.browser.localStorage
 import kotlinx.html.style
-import data.*
+import org.w3c.dom.HTMLInputElement
 import react.*
 import react.dom.a
 import react.dom.div
 import react.dom.img
-import kotlinext.js.js
-import kotlinx.browser.localStorage
-import org.w3c.dom.HTMLInputElement
+import react.router.dom.Link
 
-data class HeaderState(var user: User, var typedInName:String, var typedInPassword:String,
-                       var isAuthored: Boolean, var isModalVisible: Boolean) : State
 
-class Header(props: UserProps) : RComponent<UserProps, HeaderState>(props) {
+class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
     init {
         state = HeaderState(User(-1, ""), typedInName = "", typedInPassword = "", isAuthored = false, isModalVisible = false)
     }
@@ -36,8 +36,11 @@ class Header(props: UserProps) : RComponent<UserProps, HeaderState>(props) {
                 +"个人信息"
             }
             menuItem {
-                shoppingCartOutlined { }
-                +"购物车"
+                Link {
+                    attrs.to = "/settlement"
+                    shoppingCartOutlined { }
+                    +"购物车"
+                }
             }
             menuItem {
                 logoutOutlined { }
@@ -55,8 +58,10 @@ class Header(props: UserProps) : RComponent<UserProps, HeaderState>(props) {
         val userID = localStorage.getItem("id")
         val userName = localStorage.getItem("name")
         if (userID != null && userID.isNotEmpty() && userID.toInt() != -1 && userName != null)
-            setState(HeaderState(User(userID.toInt(), userName), typedInName = "", typedInPassword = "",
-                isAuthored = true, isModalVisible = false))
+            setState(
+                HeaderState(User(userID.toInt(), userName), typedInName = "", typedInPassword = "",
+                isAuthored = true, isModalVisible = false)
+            )
     }
 
     private fun showModal() {
@@ -103,7 +108,12 @@ class Header(props: UserProps) : RComponent<UserProps, HeaderState>(props) {
 
     override fun RBuilder.render() {
         header {
-            attrs.style = js { background = "white" }
+            attrs.style = js {
+                background = "white"
+                position = "fixed"
+                zIndex = 1
+                width = "100%"
+            }
             div {
                 attrs.style = js { float = "left" }
                 a {
