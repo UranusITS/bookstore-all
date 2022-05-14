@@ -22,11 +22,11 @@ interface CartItemRepository : CrudRepository<CartItem, Int> {
     @Query("select * from cart_items where user_id = :user_id")
     fun getItemsByUserID(@Param("user_id") user_id: Int): List<CartItem>
 
-    @Query("update cart_items set num = :num + :inc_num where id = :id")
-    fun increaseNumById(@Param("id") id: Int, @Param("inc_num") inc_num: Int)
+    @Query("select count(*) from cart_items where user_id = :user_id and book_id = :book_id")
+    fun countCartItemByUserIdAnAndBookId(@Param("user_id") user_id: Int, @Param("book_id") book_id: Int): Int
 
-    @Query("update cart_items set num = :num - :dec_num where id = :id")
-    fun decreaseNumById(@Param("id") id: Int, @Param("dec_num") dec_num: Int)
+    @Query("update cart_items set num = :num where id = :id")
+    fun updateNumById(@Param("id") id: Int, @Param("num") num: Int)
 
     @Query("update cart_items set checked = :checked where id = :id")
     fun updateCheckedById(@Param("id") id: Int, @Param("checked") checked: Boolean)
@@ -36,11 +36,16 @@ interface CartItemRepository : CrudRepository<CartItem, Int> {
 class CartItemService(val db: CartItemRepository) {
     fun getItemsByUserID(user_id: Int) = db.getItemsByUserID(user_id)
 
-    fun increaseNumById(id: Int, num: Int) = db.increaseNumById(id, num)
+    fun updateNumById(id: Int, num: Int) = db.updateNumById(id, num)
 
-    fun decreaseNumById(id: Int, num: Int) = db.decreaseNumById(id, num)
-
-    fun addItem(cart_item: CartItem) = db.save(cart_item)
+    fun addItem(cart_item: CartItem): Boolean {
+        return if(db.countCartItemByUserIdAnAndBookId(cart_item.user_id, cart_item.book_id) == 0) {
+            db.save(cart_item)
+            true
+        } else {
+            false
+        }
+    }
 
     fun deleteItemById(id: Int) = db.deleteById(id)
 
@@ -54,11 +59,8 @@ class CartItemResource(val service: CartItemService) {
     @RequestMapping("/items")
     fun getItemsByUserId(@RequestParam("user-id") user_id: Int) = service.getItemsByUserID(user_id)
 
-    @RequestMapping("/increase-num")
-    fun increaseNumById(@RequestParam("id") id: Int, @RequestParam("num") num: Int) = service.increaseNumById(id, num)
-
-    @RequestMapping("/decrease-num")
-    fun decreaseNumById(@RequestParam("id") id: Int, @RequestParam("num") num: Int) = service.decreaseNumById(id, num)
+    @RequestMapping("/update-num")
+    fun increaseNumById(@RequestParam("id") id: Int, @RequestParam("num") num: Int) = service.updateNumById(id, num)
 
     @RequestMapping("/add-item")
     fun addItem(@RequestBody cart_item: CartItem) = service.addItem(cart_item)

@@ -5,18 +5,22 @@ import antd.card.card
 import antd.grid.col
 import antd.grid.row
 import antd.icon.payCircleOutlined
-import antd.icon.shoppingCartOutlined
 import antd.layout.content
 import data.Book
-import data.SettlementState
+import data.CartItem
+import data.CartState
 import kotlinx.browser.localStorage
+import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import react.Props
 import react.RBuilder
 import react.RComponent
+import react.setState
 import style.SettlementItemStyles
 import styled.css
 import styled.styledDiv
@@ -24,27 +28,41 @@ import styled.styledP
 import kotlin.math.roundToInt
 
 
-class SettlementComponent(props: Props) : RComponent<Props, SettlementState>(props) {
+class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
     init {
-        val storageSettlement = localStorage.getItem("settlement")
-        state = if (storageSettlement != null) {
-            val books = Json.decodeFromString<SettlementState>(storageSettlement)
-            console.log(books)
-            books
-        } else SettlementState(listOf())
+        state = CartState(listOf(), .0)
+    }
+
+    private suspend fun fetchCartItems() {
+        val userID = localStorage.getItem("id")
+        val response = window.fetch("http://localhost:8080/cart-item/items?user-id=$userID")
+            .await()
+            .text()
+            .await()
+        val cartItemList = Json.decodeFromString<List<CartItem>>(response)
+        var priceTotal = .0
+        for (cartItem in cartItemList) {
+            if (cartItem.checked) {
+                val bookResponse = window.fetch("http://localhost:8080/book/get-book-by-id?id=${cartItem.book_id}")
+                    .await()
+                    .text()
+                    .await()
+                val bookPrice = Json.decodeFromString<Book>(bookResponse).price
+                priceTotal += cartItem.num * bookPrice
+            }
+        }
+        setState(CartState(cartItemList, priceTotal))
     }
 
     override fun componentDidMount() {
-        val storageSettlement = localStorage.getItem("settlement")
-        if (storageSettlement != null) {
-            val books = Json.decodeFromString<SettlementState>(storageSettlement)
-            console.log(books)
-            setState(books)
+        GlobalScope.launch {
+            console.log("OK1")
+            fetchCartItems()
+            console.log("OK2")
         }
     }
 
     override fun RBuilder.render() {
-        var priceSum = 0.0
         content {
             attrs.style = kotlinext.js.js {
                 width = 1080.px
@@ -52,14 +70,17 @@ class SettlementComponent(props: Props) : RComponent<Props, SettlementState>(pro
             }
             row {
                 attrs.gutter = 24
-                for (item in state.books) {
-                    priceSum += item.first.price * item.second
+                console.log(state.cartItemList)
+                for (item in state.cartItemList) {
                     col {
                         attrs.span = 24
-                        SettlementItemComponent {
+                        CartItemComponent {
                             attrs {
-                                book = item.first
-                                num = item.second
+                                id = item.id
+                                userId = item.user_id
+                                bookId = item.book_id
+                                num = item.num
+                                checked = item.checked
                             }
                         }
                     }
@@ -97,9 +118,7 @@ class SettlementComponent(props: Props) : RComponent<Props, SettlementState>(pro
                                     color = Color.red
                                     fontSize = 18.pt
                                 }
-                                priceSum *= 100
-                                priceSum = priceSum.roundToInt().toDouble() / 100
-                                +"￥${priceSum}"
+                                +"￥${state.priceTotal}"
                             }
                         }
                         styledDiv {

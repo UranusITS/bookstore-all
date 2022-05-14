@@ -10,15 +10,87 @@ import antd.menu.MenuClickEventHandler
 import antd.menu.menu
 import antd.menu.menuItem
 import antd.menu.subMenu
-import data.BookListProps
 import data.BookListState
-import react.RBuilder
-import react.RComponent
-import react.key
+import kotlinx.browser.window
+import kotlinx.coroutines.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.w3c.fetch.Headers
+import org.w3c.fetch.RequestInit
+import react.*
 
-class BookListComponent (props: BookListProps) : RComponent<BookListProps, BookListState>(props) {
+
+val defaultSales = listOf(
+    "assets/carousel/book1.jpg", "assets/carousel/book2.jpg",
+    "assets/carousel/book3.jpg", "assets/carousel/book4.jpg"
+)
+
+class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) {
     init {
-        state = BookListState(props.bookList, props.bookList.getTypeWithTrue())
+        state = BookListState(listOf(), listOf(), defaultSales)
+    }
+
+    private suspend fun fetchBookList() {
+        val response = window.fetch("http://localhost:8080/book/books")
+            .await()
+            .text()
+            .await()
+        setState { bookList = Json.decodeFromString(response) }
+    }
+
+    private suspend fun fetchBookListByText(text: String) {
+        val response = window.fetch("http://localhost:8080/book/get-books-by-text?text=$text")
+            .await()
+            .text()
+            .await()
+        setState { bookList = Json.decodeFromString(response) }
+    }
+
+    private suspend fun fetchBookListByTypes() {
+        var flag = true
+        val types = mutableListOf<String>()
+        for (type in state.types) {
+            if (type.second) {
+                types.add(type.first)
+                flag = false
+            }
+        }
+        if (flag) {
+            for (type in state.types) {
+                types.add(type.first)
+            }
+        }
+        val headers = Headers()
+        headers.append("Content-Type", "application/json;charset=UTF-8")
+        val response = window.fetch(
+            "http://localhost:8080/book/get-books-by-types",
+            RequestInit(method = "POST",  headers = headers, body = Json.encodeToString(types))
+        )
+            .await()
+            .text()
+            .await()
+        setState { bookList = Json.decodeFromString(response) }
+    }
+
+    private suspend fun fetchTypeList() {
+        val response = window.fetch("http://localhost:8080/book/types")
+            .await()
+            .text()
+            .await()
+        val typeStringList = Json.decodeFromString<List<String>>(response)
+        val typeList = mutableListOf<Pair<String, Boolean>>()
+        for (typeString in typeStringList) {
+            typeList.add(Pair(typeString, false))
+        }
+        setState { types = typeList }
+    }
+
+    override fun componentDidMount() {
+        GlobalScope.launch {
+            fetchBookList()
+            fetchTypeList()
+        }
     }
 
     private var typeCount = 0
@@ -28,12 +100,14 @@ class BookListComponent (props: BookListProps) : RComponent<BookListProps, BookL
         if (state.types.indexOf(Pair(info.key, true)) != -1) {
             newList[newList.indexOf(Pair(info.key, true))] = Pair(info.key.toString(), false)
             ++typeCount
-        }
-        else {
+        } else {
             newList[newList.indexOf(Pair(info.key, false))] = Pair(info.key.toString(), true)
             --typeCount
         }
-        setState(BookListState(state.bookList, newList))
+        GlobalScope.launch {
+            fetchBookListByTypes()
+        }
+        setState { types = newList }
     }
 
     override fun RBuilder.render() {
@@ -49,14 +123,19 @@ class BookListComponent (props: BookListProps) : RComponent<BookListProps, BookL
                     enterButton = true
                     size = "large"
                     onSearch = { value, _ ->
-                        if (value == "")
-                            setState(BookListState(props.bookList, state.types))
-                        else
-                            setState(BookListState(props.bookList.getByContent(value), state.types))
+                        if (value == "") {
+                            GlobalScope.launch {
+                                fetchBookList()
+                            }
+                        } else {
+                            GlobalScope.launch {
+                                fetchBookListByText(value)
+                            }
+                        }
                     }
                 }
             }
-            SaleCarousel { attrs.sales = props.sales }
+            SaleCarousel { attrs.sales = state.sales }
             layout {
                 sider {
                     attrs.style = kotlinext.js.js {
@@ -72,11 +151,11 @@ class BookListComponent (props: BookListProps) : RComponent<BookListProps, BookL
                         subMenu {
                             attrs.title = "图书种类"
                             attrs.key = "type"
-                            val types = props.bookList.getType()
+                            val types = state.types
                             for (pos in types.indices) {
                                 menuItem {
-                                    attrs.key = types[pos]
-                                    +types[pos]
+                                    attrs.key = types[pos].first
+                                    +types[pos].first
                                 }
                             }
                         }
@@ -85,9 +164,7 @@ class BookListComponent (props: BookListProps) : RComponent<BookListProps, BookL
                 content {
                     row {
                         attrs.gutter = 24
-                        for (book in state.bookList.books) {
-                            if (typeCount!=0 && state.types.indexOf(Pair(book.type, false)) == -1)
-                                continue
+                        for (book in state.bookList) {
                             col {
                                 attrs.span = 6
                                 BookItemComponent {
@@ -100,7 +177,7 @@ class BookListComponent (props: BookListProps) : RComponent<BookListProps, BookL
                                         price = book.price
                                         description = book.description
                                         inventory = book.inventory
-                                        imgPath = book.imgPath
+                                        imgPath = book.img_path
                                     }
                                 }
                             }

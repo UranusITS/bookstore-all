@@ -71,6 +71,14 @@ class BookService(val db: BookRepository) {
 
     fun getBooksByType(type: String) = db.getBooksByType(type)
 
+    fun getBooksByTypes(types: List<String>): List<Book> {
+        val re = mutableListOf<Book>()
+        for (type in types) {
+            re.addAll(db.getBooksByType(type))
+        }
+        return re.toList()
+    }
+
     fun getBooksByText(text: String) = db.getBooksByText(text)
 
     fun getBookById(id: Int) = db.getBookById(id)
@@ -97,35 +105,49 @@ class BookService(val db: BookRepository) {
 @CrossOrigin
 @RequestMapping("/book")
 class BookResource(val service: BookService) {
+    @CrossOrigin
     @RequestMapping("/books")
     fun getBooks() = service.getBooks()
 
+    @CrossOrigin
     @RequestMapping("/types")
     fun getTypes() = service.getTypes()
 
+    @CrossOrigin
     @RequestMapping("/get-books-by-type")
     fun getBooksByType(@RequestParam("type") type: String) = service.getBooksByType(type)
 
+    @CrossOrigin(origins = ["http://localhost:8081"])
+    @RequestMapping("/get-books-by-types")
+    fun getBooksByTypes(@RequestBody types: List<String>) = service.getBooksByTypes(types)
+
+    @CrossOrigin
     @RequestMapping("/get-books-by-text")
     fun getBooksByText(@RequestParam("text") text: String) = service.getBooksByText(text)
 
+    @CrossOrigin
     @RequestMapping("/get-book-by-id")
     fun getBookById(@RequestParam("id") id: Int) = service.getBookById(id)
 
+    @CrossOrigin
     @RequestMapping("/increase-inventory")
     fun increaseInventory(@RequestParam("id") id: Int, @RequestParam("num") num: Int) =
         service.increaseInventory(id, num)
 
+    @CrossOrigin
     @RequestMapping("/decrease-inventory")
     fun decreaseInventory(@RequestParam("id") id: Int, @RequestParam("num") num: Int) =
         service.decreaseInventory(id, num)
 
+    @CrossOrigin
     @RequestMapping("/update-book")
     fun updateBook(@RequestBody book: Book) = service.updateBook(book)
 
+    @CrossOrigin
     @RequestMapping("/add-book")
     fun addBook(@RequestBody book: Book) = service.addBook(book)
 
+    @CrossOrigin
     @RequestMapping("/delete-book")
     fun deleteBook(@RequestParam("id") id: Int) = service.deleteBook(id)
 }

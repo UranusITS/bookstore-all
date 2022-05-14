@@ -9,13 +9,20 @@ import antd.input.password
 import antd.layout.header
 import antd.menu.menu
 import antd.menu.menuItem
+import antd.message.message
 import antd.modal.modal
 import antd.space.space
 import data.HeaderState
 import data.User
 import kotlinext.js.js
 import kotlinx.browser.localStorage
+import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import kotlinx.html.style
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.w3c.dom.HTMLInputElement
 import react.*
 import react.dom.a
@@ -26,7 +33,13 @@ import react.router.dom.Link
 
 class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
     init {
-        state = HeaderState(User(-1, ""), typedInName = "", typedInPassword = "", isAuthored = false, isModalVisible = false)
+        state = HeaderState(
+            User(-1, "", "", -1),
+            typedInName = "",
+            typedInPassword = "",
+            isAuthored = false,
+            isModalVisible = false
+        )
     }
 
     private val menu = buildElement {
@@ -37,7 +50,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
             }
             menuItem {
                 Link {
-                    attrs.to = "/settlement"
+                    attrs.to = "/cart"
                     shoppingCartOutlined { }
                     +"购物车"
                 }
@@ -46,9 +59,14 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                 logoutOutlined { }
                 +"退出登录"
                 attrs.onClick = {
-                    localStorage.setItem("id","")
-                    localStorage.setItem("name","")
-                    setState(HeaderState(User(-1, ""), state.typedInName, state.typedInPassword, isAuthored=false, isModalVisible=false))
+                    localStorage.setItem("id", "")
+                    localStorage.setItem("name", "")
+                    localStorage.setItem("authLevel", "")
+                    setState {
+                        user = User(-1, "", "", -1)
+                        isAuthored = false
+                        isModalVisible = false
+                    }
                 }
             }
         }
@@ -56,54 +74,108 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
 
     override fun componentDidMount() {
         val userID = localStorage.getItem("id")
-        val userName = localStorage.getItem("name")
-        if (userID != null && userID.isNotEmpty() && userID.toInt() != -1 && userName != null)
+        val username = localStorage.getItem("name")
+        val authLevel = localStorage.getItem("authLevel")
+        if (userID != null && userID.isNotEmpty() && userID.toInt() != -1 && username != null
+            && authLevel != null && authLevel.isNotEmpty() && authLevel.toInt() != -1
+        )
             setState(
-                HeaderState(User(userID.toInt(), userName), typedInName = "", typedInPassword = "",
-                isAuthored = true, isModalVisible = false)
+                HeaderState(
+                    User(userID.toInt(), username, "", authLevel.toInt()), typedInName = "", typedInPassword = "",
+                    isAuthored = true, isModalVisible = false
+                )
             )
     }
 
     private fun showModal() {
-        setState(HeaderState(state.user, state.typedInName, state.typedInPassword, state.isAuthored, isModalVisible = true))
+        setState{ isModalVisible = true }
     }
 
     private fun modalCancel() {
-        setState(HeaderState(state.user, state.typedInName, state.typedInPassword, state.isAuthored, isModalVisible = false))
+        setState { isModalVisible = false }
     }
 
-    private fun checkLogin(): Int {
-        return 100
-    }
 
-    private fun login() {
-        val id = checkLogin()
-        if (id != -1) {
-            localStorage.setItem("id", id.toString())
-            localStorage.setItem("name", state.typedInName)
-            setState(HeaderState(User(id, state.typedInName), typedInName = "", typedInPassword = "", isAuthored = true, isModalVisible=false))
+    private suspend fun login() {
+        val response =
+            window.fetch(
+                "http://localhost:8080/user/login?" +
+                        "username=${state.typedInName}&password=${state.typedInPassword}"
+            )
+                .await()
+                .text()
+                .await()
+        val user = Json.decodeFromString<User>(response)
+        if (user.id != -1) {
+            message.success("登录成功")
+            localStorage.setItem("id", user.id.toString())
+            localStorage.setItem("name", user.username)
+            localStorage.setItem("authLevel", user.auth_level.toString())
+            setState(
+                HeaderState(
+                    user,
+                    typedInName = "",
+                    typedInPassword = "",
+                    isAuthored = true,
+                    isModalVisible = false
+                )
+            )
+        } else {
+            message.error("登录失败")
         }
     }
 
-    private fun checkRegister(): Int {
-        return 100
-    }
-
-    private fun register() {
-        val id = checkRegister()
-        if (id != -1) {
-            localStorage.setItem("id", id.toString())
-            localStorage.setItem("name", state.typedInName)
-            setState(HeaderState(User(id, state.typedInName), typedInName = "", typedInPassword = "", isAuthored = true, isModalVisible=false))
+    private suspend fun register() {
+        val response =
+            window.fetch(
+                "http://localhost:8080/user/register?" +
+                        "username=${state.typedInName}&password=${state.typedInPassword}"
+            )
+                .await()
+                .text()
+                .await()
+        val user = Json.decodeFromString<User>(response)
+        if (user.id != -1) {
+            message.success("注册成功")
+            localStorage.setItem("id", user.id.toString())
+            localStorage.setItem("name", user.username)
+            localStorage.setItem("authLevel", user.auth_level.toString())
+            setState(
+                HeaderState(
+                    user,
+                    typedInName = "",
+                    typedInPassword = "",
+                    isAuthored = true,
+                    isModalVisible = false
+                )
+            )
+        } else {
+            message.error("注册失败")
         }
     }
 
     private val nameInputChangeHandler: ChangeEventHandler<HTMLInputElement> = {
-        setState(HeaderState(state.user, it.target.asDynamic().value as String, state.typedInPassword, state.isAuthored, state.isModalVisible))
+        setState(
+            HeaderState(
+                state.user,
+                it.target.asDynamic().value as String,
+                state.typedInPassword,
+                state.isAuthored,
+                state.isModalVisible
+            )
+        )
     }
 
     private val passwordInputChangeHandler: ChangeEventHandler<HTMLInputElement> = {
-        setState(HeaderState(state.user, state.typedInName, it.target.asDynamic().value as String, state.isAuthored, state.isModalVisible))
+        setState(
+            HeaderState(
+                state.user,
+                state.typedInName,
+                it.target.asDynamic().value as String,
+                state.isAuthored,
+                state.isModalVisible
+            )
+        )
     }
 
     override fun RBuilder.render() {
@@ -134,13 +206,12 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                     dropdown {
                         attrs.overlay = menu
                         button {
-                            +"Hello, ${state.user.name}"
+                            +"Hello, ${state.user.username}"
                             downOutlined { }
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 div {
                     attrs.style = js { float = "right" }
                     button {
@@ -171,7 +242,9 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                                 attrs.placeholder = "请输入用户名"
                                 attrs.onChange = nameInputChangeHandler
                                 attrs.onPressEnter = {
-                                    login()
+                                    GlobalScope.launch {
+                                        login()
+                                    }
                                 }
                             }
                             password {
@@ -179,21 +252,27 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                                 attrs.placeholder = "请输入密码"
                                 attrs.onChange = passwordInputChangeHandler
                                 attrs.onPressEnter = {
-                                    login()
+                                    GlobalScope.launch {
+                                        login()
+                                    }
                                 }
                             }
                             button {
                                 attrs.block = true
                                 attrs.type = "primary"
                                 attrs.onClick = {
-                                    login()
+                                    GlobalScope.launch {
+                                        login()
+                                    }
                                 }
                                 +"登录"
                             }
                             button {
                                 attrs.block = true
                                 attrs.onClick = {
-                                    register()
+                                    GlobalScope.launch {
+                                        register()
+                                    }
                                 }
                                 +"注册"
                             }

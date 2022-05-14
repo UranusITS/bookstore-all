@@ -12,9 +12,13 @@ import antd.message.message
 import style.BookDetailStyles
 import data.Book
 import data.BookProps
-import data.SettlementState
+import data.CartItem
 import kotlinext.js.js
 import kotlinx.browser.localStorage
+import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -24,6 +28,8 @@ import styled.styledDiv
 import styled.styledImg
 import styled.styledSpan
 import kotlinx.serialization.json.Json
+import org.w3c.fetch.Headers
+import org.w3c.fetch.RequestInit
 
 
 val BookDetailComponent = fc<BookProps> { props ->
@@ -99,33 +105,32 @@ val BookDetailComponent = fc<BookProps> { props ->
                                 type = "primary"
                                 size = "large"
                                 onClick = {
-                                    val storageSettlement = localStorage.getItem("settlement")
-                                    console.log(storageSettlement)
-                                    if (storageSettlement != null) {
-                                        val books = Json.decodeFromString<SettlementState>(storageSettlement)
-                                        val newBooks = books.books.toMutableList()
-                                        var foundFlag = false
-                                        for (book in newBooks)
-                                            if (book.first.id == props.id) {
-                                                foundFlag = true
-                                                break
+                                    val userId = localStorage.getItem("id")
+                                    if (userId == null || userId.toInt() == -1) {
+                                        message.error("请先登录")
+                                    } else {
+                                        GlobalScope.launch {
+                                            val headers = Headers()
+                                            headers.append("Content-Type", "application/json;charset=UTF-8")
+                                            val cartItem = CartItem(null, userId.toInt(), props.id, 1, true)
+                                            val response = window.fetch(
+                                                "http://localhost:8080/cart-item/add-item",
+                                                RequestInit(
+                                                    method = "POST",
+                                                    headers = headers,
+                                                    body = Json.encodeToString(cartItem)
+                                                )
+                                            )
+                                                .await()
+                                                .text()
+                                                .await()
+                                                .toBoolean()
+                                            if (response) {
+                                                message.success("加入购物车成功")
+                                            } else {
+                                                message.info("已在购物车中")
                                             }
-                                        if (!foundFlag) {
-                                            val book = Book(props.id, props.isbn, props.name, props.type, props.author,
-                                                props.price, props.description, props.inventory, props.imgPath)
-                                            newBooks.add(Pair(book, 1))
-                                            localStorage.setItem("settlement", Json.encodeToString(SettlementState(newBooks)))
-                                            message.success("加入购物车成功")
                                         }
-                                        else {
-                                            message.info("已在购物车中")
-                                        }
-                                    }
-                                    else {
-                                        val book = Book(props.id, props.isbn, props.name, props.type, props.author,
-                                            props.price, props.description, props.inventory, props.imgPath)
-                                        localStorage.setItem("settlement", Json.encodeToString(SettlementState(listOf(Pair(book, 1)))))
-                                        message.success("加入购物车成功")
                                     }
                                 }
                             }

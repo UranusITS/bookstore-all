@@ -4,9 +4,20 @@ import antd.button.button
 import antd.card.card
 import antd.icon.deleteOutlined
 import antd.inputnumber.inputNumber
-import data.SettlementItemProps
+import data.Book
+import data.CartItemProps
+import kotlinext.js.js
+import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import react.buildElement
 import react.fc
+import react.useEffectOnce
+import react.useState
 import style.SettlementItemStyles
 import styled.css
 import styled.styledDiv
@@ -14,11 +25,23 @@ import styled.styledImg
 import styled.styledP
 
 
-val SettlementItemComponent = fc<SettlementItemProps> { props ->
+suspend fun fetchBook(bookId: Int): Book {
+    val response = window.fetch("http://localhost:8080/book/get-book-by-id?id=$bookId")
+        .await()
+        .text()
+        .await()
+    return Json.decodeFromString(response)
+}
+
+val CartItemComponent = fc<CartItemProps> { props ->
+    var book: Book by useState(Book())
+    GlobalScope.launch {
+        book = fetchBook(props.bookId)
+    }
     styledDiv {
         card {
             attrs.bordered = true
-            attrs.style = kotlinext.js.js {
+            attrs.style = js {
                 margin = "0 auto"
                 width = 1200
             }
@@ -26,7 +49,7 @@ val SettlementItemComponent = fc<SettlementItemProps> { props ->
                 css { +SettlementItemStyles.inline }
                 styledImg {
                     attrs.width = "128px"
-                    attrs.src = props.book.imgPath
+                    attrs.src = book.img_path
                 }
             }
             styledDiv {
@@ -36,11 +59,11 @@ val SettlementItemComponent = fc<SettlementItemProps> { props ->
                 }
                 styledP {
                     css { +SettlementItemStyles.bookName }
-                    +props.book.name
+                    +book.name
                 }
                 styledP {
                     css { +SettlementItemStyles.author }
-                    +props.book.author
+                    +book.author
                 }
             }
             styledDiv {
@@ -60,8 +83,17 @@ val SettlementItemComponent = fc<SettlementItemProps> { props ->
                     inputNumber {
                         attrs.size = "large"
                         attrs.min = 1
-                        attrs.max = props.book.inventory
+                        attrs.max = book.inventory
                         attrs.defaultValue = props.num
+                        attrs.onChange = {
+                            val num = attrs.value
+                            console.log(num)
+                            /**
+                            GlobalScope.launch {
+                                window.fetch("http://localhost:8080/cart-item/update-num?id=${props.id}&num=$num")
+                            }
+                            */
+                        }
                     }
                 }
                 styledDiv {
@@ -77,7 +109,7 @@ val SettlementItemComponent = fc<SettlementItemProps> { props ->
                     +SettlementItemStyles.inline
                     +SettlementItemStyles.price
                 }
-                styledP { +"￥${props.num * props.book.price}" }
+                styledP { +"￥${props.num * book.price}" }
             }
             styledDiv {
                 css {

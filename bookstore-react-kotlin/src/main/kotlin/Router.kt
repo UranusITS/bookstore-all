@@ -1,7 +1,6 @@
-import kotlinx.browser.localStorage
 import page.bookPage
+import page.cartPage
 import page.homePage
-import page.settlementPage
 import react.*
 import react.router.Route
 import react.router.Routes
@@ -16,8 +15,8 @@ class BasicRoute(props: Props): RComponent<Props, State>(props) {
                     attrs.element = createElement(homePage)
                 }
                 Route {
-                    attrs.path = "settlement"
-                    attrs.element = createElement(settlementPage)
+                    attrs.path = "cart"
+                    attrs.element = createElement(cartPage)
                 }
                 Route {
                     attrs.path = "book"

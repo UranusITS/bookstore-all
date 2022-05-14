@@ -43,16 +43,16 @@ class UserService(val db: UserRepository) {
 @RequestMapping("/user")
 class UserResource(val service: UserService) {
     @RequestMapping("/login")
-    fun login(@RequestParam("username") username: String, @RequestParam("password") password: String): Int {
+    fun login(@RequestParam("username") username: String, @RequestParam("password") password: String): User {
         val user = service.getUserByUsernameAndPassword(username, password)
-        return user?.auth_level ?: -1
+        return user ?: User(-1, "", "", -1)
     }
 
     @RequestMapping("/register")
-    fun register(@RequestParam("username") username: String, @RequestParam("password") password: String): Boolean {
-        if (service.countUserByUsername(username) == 0)
-            return false
-        service.addUser(User(null, username, password, 0))
-        return true
+    fun register(@RequestParam("username") username: String, @RequestParam("password") password: String): User {
+        return if (service.countUserByUsername(username) != 0)
+            User(-1, "", "", -1)
+        else
+            service.addUser(User(null, username, password, 0))
     }
 }
