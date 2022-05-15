@@ -5,7 +5,10 @@ import antd.button.button
 import antd.card.card
 import antd.icon.deleteOutlined
 import antd.inputnumber.inputNumber
-import data.*
+import data.Book
+import data.CartItem
+import data.CartItemProps
+import data.CartItemState
 import kotlinext.js.js
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
@@ -14,9 +17,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.HTMLInputElement
-import org.w3c.fetch.Headers
-import org.w3c.fetch.RequestInit
-import react.*
+import react.RBuilder
+import react.RComponent
+import react.buildElement
+import react.setState
 import style.SettlementItemStyles
 import styled.css
 import styled.styledDiv
@@ -36,10 +40,7 @@ class CartItemComponent(props: CartItemProps) : RComponent<CartItemProps, CartIt
     }
 
     private suspend fun fetchBook(bookId: Int) {
-        val response = window.fetch("http://localhost:8080/book/get-book-by-id?id=$bookId")
-            .await()
-            .text()
-            .await()
+        val response = window.fetch("http://localhost:8080/book/get-book-by-id?id=$bookId").await().text().await()
         setState { book = Json.decodeFromString(response) }
     }
 

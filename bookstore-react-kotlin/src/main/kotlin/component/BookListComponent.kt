@@ -12,7 +12,9 @@ import antd.menu.menuItem
 import antd.menu.subMenu
 import data.BookListState
 import kotlinx.browser.window
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -65,7 +67,7 @@ class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) 
         headers.append("Content-Type", "application/json;charset=UTF-8")
         val response = window.fetch(
             "http://localhost:8080/book/get-books-by-types",
-            RequestInit(method = "POST",  headers = headers, body = Json.encodeToString(types))
+            RequestInit(method = "POST", headers = headers, body = Json.encodeToString(types))
         )
             .await()
             .text()

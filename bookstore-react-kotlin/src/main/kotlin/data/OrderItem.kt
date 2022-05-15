@@ -1,7 +1,5 @@
 package data
 
-import kotlinx.serialization.Serializable
-
 
 @kotlinx.serialization.Serializable
 data class OrderItem(

@@ -2,9 +2,11 @@ package page
 
 import antd.layout.content
 import antd.layout.layout
-import component.*
+import component.BookDetailComponent
+import component.FooterComponent
+import component.HeaderComponent
+import component.errorComponent
 import data.Book
-import style.BookDetailStyles
 import data.BookProps
 import kotlinext.js.js
 import kotlinx.browser.window
@@ -16,8 +18,8 @@ import kotlinx.serialization.json.Json
 import react.dom.div
 import react.fc
 import react.router.useParams
-import react.setState
 import react.useState
+import style.BookDetailStyles
 import styled.css
 import styled.styledDiv
 

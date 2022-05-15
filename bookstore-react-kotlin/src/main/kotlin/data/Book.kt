@@ -1,7 +1,7 @@
 package data
 
-import react.Props
 import kotlinx.serialization.Serializable
+import react.Props
 
 
 @Serializable
@@ -14,7 +14,8 @@ data class Book(
                 props.id, props.isbn, props.name, props.type, props.author,
                 props.price, props.description, props.inventory, props.imgPath
             )
-    constructor(): this(-1, "", "", "", "", .0, "", 0, "")
+
+    constructor() : this(-1, "", "", "", "", .0, "", 0, "")
 }
 
 external interface BookProps : Props {

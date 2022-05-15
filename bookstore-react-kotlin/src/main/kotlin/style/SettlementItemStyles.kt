@@ -3,7 +3,7 @@ package style
 import kotlinx.css.*
 import styled.StyleSheet
 
-object SettlementItemStyles:StyleSheet(name = "SettlementItemStyles", isStatic = true) {
+object SettlementItemStyles : StyleSheet(name = "SettlementItemStyles", isStatic = true) {
     val inline by css {
         display = Display.inlineBlock
     }

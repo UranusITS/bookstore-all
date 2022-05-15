@@ -9,8 +9,6 @@ import antd.icon.payCircleOutlined
 import antd.icon.shoppingCartOutlined
 import antd.icon.starOutlined
 import antd.message.message
-import style.BookDetailStyles
-import data.Book
 import data.BookProps
 import data.CartItem
 import kotlinext.js.js
@@ -20,16 +18,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.css.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.w3c.fetch.Headers
+import org.w3c.fetch.RequestInit
 import react.fc
+import style.BookDetailStyles
 import styled.css
 import styled.styledDiv
 import styled.styledImg
 import styled.styledSpan
-import kotlinx.serialization.json.Json
-import org.w3c.fetch.Headers
-import org.w3c.fetch.RequestInit
 
 
 val BookDetailComponent = fc<BookProps> { props ->

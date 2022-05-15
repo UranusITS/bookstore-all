@@ -1,11 +1,11 @@
 package component
 
 import antd.carousel.carousel
-import style.SaleCarouselStyles
 import data.SaleCarouselProps
 import react.dom.div
 import react.dom.img
 import react.fc
+import style.SaleCarouselStyles
 import styled.css
 import styled.styledDiv
 

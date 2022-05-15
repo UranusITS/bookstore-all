@@ -60,7 +60,6 @@ class CartItemService(val db: CartItemRepository) {
 }
 
 @RestController
-@CrossOrigin
 @RequestMapping("/cart-item")
 class CartItemResource(val service: CartItemService) {
     @RequestMapping("/items")

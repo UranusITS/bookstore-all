@@ -6,7 +6,6 @@ import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -39,7 +38,6 @@ class UserService(val db: UserRepository) {
 }
 
 @RestController
-@CrossOrigin
 @RequestMapping("/user")
 class UserResource(val service: UserService) {
     @RequestMapping("/login")

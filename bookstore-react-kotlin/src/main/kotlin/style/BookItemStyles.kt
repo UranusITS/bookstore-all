@@ -3,7 +3,7 @@ package style
 import kotlinx.css.*
 import styled.StyleSheet
 
-object BookItemStyles:StyleSheet(name = "BookItemStyles", isStatic = true) {
+object BookItemStyles : StyleSheet(name = "BookItemStyles", isStatic = true) {
     val frame by css {
         marginBottom = 24.px
         marginLeft = 12.px

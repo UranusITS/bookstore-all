@@ -7,7 +7,6 @@ import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -106,52 +105,40 @@ class BookService(val db: BookRepository) {
 }
 
 @RestController
-@CrossOrigin
 @RequestMapping("/book")
 class BookResource(val service: BookService) {
-    @CrossOrigin
     @RequestMapping("/books")
     fun getBooks() = service.getBooks()
 
-    @CrossOrigin
     @RequestMapping("/types")
     fun getTypes() = service.getTypes()
 
-    @CrossOrigin
     @RequestMapping("/get-books-by-type")
     fun getBooksByType(@RequestParam("type") type: String) = service.getBooksByType(type)
 
-    @CrossOrigin(origins = ["http://localhost:8081"])
     @RequestMapping("/get-books-by-types")
     fun getBooksByTypes(@RequestBody types: List<String>) = service.getBooksByTypes(types)
 
-    @CrossOrigin
     @RequestMapping("/get-books-by-text")
     fun getBooksByText(@RequestParam("text") text: String) = service.getBooksByText(text)
 
-    @CrossOrigin
     @RequestMapping("/get-book-by-id")
     fun getBookById(@RequestParam("id") id: Int) = service.getBookById(id)
 
-    @CrossOrigin
     @RequestMapping("/increase-inventory")
     fun increaseInventory(@RequestParam("id") id: Int, @RequestParam("num") num: Int) =
         service.increaseInventory(id, num)
 
-    @CrossOrigin
     @RequestMapping("/decrease-inventory")
     fun decreaseInventory(@RequestParam("id") id: Int, @RequestParam("num") num: Int) =
         service.decreaseInventory(id, num)
 
-    @CrossOrigin
     @RequestMapping("/update-book")
     fun updateBook(@RequestBody book: Book) = service.updateBook(book)
 
-    @CrossOrigin
     @RequestMapping("/add-book")
     fun addBook(@RequestBody book: Book) = service.addBook(book)
 
-    @CrossOrigin
     @RequestMapping("/delete-book")
     fun deleteBook(@RequestParam("id") id: Int) = service.deleteBook(id)
 }

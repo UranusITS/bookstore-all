@@ -54,7 +54,6 @@ class AddressService(val db: AddressRepository) {
 }
 
 @RestController
-@CrossOrigin
 @RequestMapping("/address")
 class AddressResource(val service: AddressService) {
     @RequestMapping("/get-address-by-id")

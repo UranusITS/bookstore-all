@@ -1,9 +1,9 @@
 package page
 
 import antd.layout.layout
+import component.CartComponent
 import component.FooterComponent
 import component.HeaderComponent
-import component.CartComponent
 import react.Props
 import react.dom.div
 import react.fc

@@ -35,7 +35,6 @@ class OrderItemService(val db: OrderItemRepository) {
 }
 
 @RestController
-@CrossOrigin
 @RequestMapping("/order-item")
 class OrderItemResource(val service: OrderItemService) {
     @RequestMapping("/items")

@@ -6,7 +6,7 @@ import react.router.Route
 import react.router.Routes
 import react.router.dom.HashRouter
 
-class BasicRoute(props: Props): RComponent<Props, State>(props) {
+class BasicRoute(props: Props) : RComponent<Props, State>(props) {
     override fun RBuilder.render() {
         HashRouter {
             Routes {

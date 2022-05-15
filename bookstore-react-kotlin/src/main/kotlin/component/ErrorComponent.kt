@@ -22,7 +22,7 @@ val errorComponent = fc<ErrorProps> { props ->
                     attrs.onClick = {
                         history.back()
                     }
-                    + "回到上一页"
+                    +"回到上一页"
                 }
             }
         }

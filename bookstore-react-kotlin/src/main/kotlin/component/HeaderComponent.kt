@@ -88,7 +88,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
     }
 
     private fun showModal() {
-        setState{ isModalVisible = true }
+        setState { isModalVisible = true }
     }
 
     private fun modalCancel() {

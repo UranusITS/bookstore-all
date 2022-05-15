@@ -11,8 +11,9 @@ data class Address(
     var phone_number: String,
     var address_detail: String
 ) {
-    constructor(): this(null, 0, "", "", "")
-    constructor(user_id: Int): this(null, user_id, "", "", "")
+    constructor() : this(null, 0, "", "", "")
+    constructor(user_id: Int) : this(null, user_id, "", "", "")
+
     fun toAddressItem(): String {
         return "$name $phone_number $address_detail"
     }

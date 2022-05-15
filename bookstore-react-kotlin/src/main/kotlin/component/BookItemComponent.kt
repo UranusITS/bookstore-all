@@ -2,7 +2,6 @@ package component
 
 import antd.card.card
 import antd.card.cardMeta
-import style.BookItemStyles
 import data.BookProps
 import kotlinext.js.js
 import react.buildElement
@@ -10,6 +9,7 @@ import react.dom.attrs
 import react.dom.img
 import react.fc
 import react.router.dom.Link
+import style.BookItemStyles
 import styled.css
 import styled.styledDiv
 import styled.styledP
