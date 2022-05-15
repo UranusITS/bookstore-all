@@ -1,6 +1,7 @@
 package team.solar.bookstorebackend
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
@@ -25,11 +26,17 @@ interface CartItemRepository : CrudRepository<CartItem, Int> {
     @Query("select count(*) from cart_items where user_id = :user_id and book_id = :book_id")
     fun countCartItemByUserIdAnAndBookId(@Param("user_id") user_id: Int, @Param("book_id") book_id: Int): Int
 
+    @Modifying
     @Query("update cart_items set num = :num where id = :id")
     fun updateNumById(@Param("id") id: Int, @Param("num") num: Int)
 
+    @Modifying
     @Query("update cart_items set checked = :checked where id = :id")
     fun updateCheckedById(@Param("id") id: Int, @Param("checked") checked: Boolean)
+
+    @Modifying
+    @Query("delete from cart_items where user_id = :user_id and checked = true")
+    fun deleteByUserId(@Param("user_id") user_id: Int)
 }
 
 @Service
@@ -47,7 +54,7 @@ class CartItemService(val db: CartItemRepository) {
         }
     }
 
-    fun deleteItemById(id: Int) = db.deleteById(id)
+    fun deleteItemByUserId(user_id: Int) = db.deleteByUserId(user_id)
 
     fun updateCheckedById(id: Int, checked: Boolean) = db.updateCheckedById(id, checked)
 }
@@ -66,7 +73,7 @@ class CartItemResource(val service: CartItemService) {
     fun addItem(@RequestBody cart_item: CartItem) = service.addItem(cart_item)
 
     @RequestMapping("/delete-item")
-    fun deleteItem(@RequestParam("id") id: Int) = service.deleteItemById(id)
+    fun deleteItem(@RequestParam("user-id") user_id: Int) = service.deleteItemByUserId(user_id)
 
     @RequestMapping("/update-checked")
     fun updateCheckedById(@RequestParam("id") id: Int, @RequestParam("checked") checked: Boolean) =

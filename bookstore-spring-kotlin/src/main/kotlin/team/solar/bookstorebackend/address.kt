@@ -1,6 +1,7 @@
 package team.solar.bookstorebackend
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
@@ -25,6 +26,7 @@ interface AddressRepository : CrudRepository<Address, Int> {
     @Query("select * from address where user_id = :user_id")
     fun getAddressByUserId(@Param("user_id") user_id: Int): List<Address>
 
+    @Modifying
     @Query(
         "update address set name = :name, phone_number = :phone_number, " +
                 "address_detail = :address_detail where id = :id"

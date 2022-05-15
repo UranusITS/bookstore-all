@@ -1,6 +1,7 @@
 package team.solar.bookstorebackend
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
@@ -45,12 +46,15 @@ interface BookRepository : CrudRepository<Book, Int> {
     @Query("select * from books where id = :id")
     fun getBookById(@Param("id") id: Int): Book?
 
+    @Modifying
     @Query("update books set inventory = inventory + :num where id = :id")
     fun increaseInventoryById(@Param("id") id: Int, @Param("num") num: Int)
 
+    @Modifying
     @Query("update books set inventory = inventory - :num where id = :id")
     fun decreaseInventoryById(@Param("id") id: Int, @Param("num") num: Int)
 
+    @Modifying
     @Query(
         "update books set isbn = :isbn, name = :name, type = :type, author = :author, price = :price, " +
                 "description = :description, inventory = :inventory, imgPath = :imgPath where id = :id"
