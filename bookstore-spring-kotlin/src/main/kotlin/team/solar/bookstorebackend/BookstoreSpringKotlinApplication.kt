@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
 
 @WebFilter(filterName = "CorsFilter")
 @Configuration
-class CorsFilter: Filter {
+class CorsFilter : Filter {
     override fun doFilter(req: ServletRequest?, res: ServletResponse?, chain: FilterChain?) {
         val response = res as HttpServletResponse
         response.setHeader("Access-Control-Allow-Origin", "*")
