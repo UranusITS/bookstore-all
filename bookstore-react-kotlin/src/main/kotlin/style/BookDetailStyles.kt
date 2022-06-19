@@ -12,6 +12,7 @@ object BookDetailStyles : StyleSheet(name = "BookDetailStyles", isStatic = true)
         fontSize = 24.pt
         fontWeight = FontWeight.bold
         marginBottom = 48.px
+        marginRight = 180.px
     }
     val buttons by css {
         marginTop = 120.px

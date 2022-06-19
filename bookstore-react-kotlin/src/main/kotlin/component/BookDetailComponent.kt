@@ -5,9 +5,7 @@ import antd.descriptions.descriptions
 import antd.descriptions.descriptionsItem
 import antd.grid.col
 import antd.grid.row
-import antd.icon.payCircleOutlined
-import antd.icon.shoppingCartOutlined
-import antd.icon.starOutlined
+import antd.icon.*
 import antd.message.message
 import data.BookProps
 import data.CartItem
@@ -22,8 +20,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.fetch.Headers
 import org.w3c.fetch.RequestInit
+import react.buildElement
 import react.fc
+import react.router.dom.Link
 import style.BookDetailStyles
+import style.SettlementItemStyles
 import styled.css
 import styled.styledDiv
 import styled.styledImg
@@ -45,8 +46,28 @@ val BookDetailComponent = fc<BookProps> { props ->
             col {
                 attrs.span = "12"
                 styledDiv {
-                    css { +BookDetailStyles.bookName }
-                    +props.name
+                    styledSpan {
+                        css { +BookDetailStyles.bookName }
+                        +props.name
+                    }
+                    val authLevel = localStorage.getItem("authLevel")
+                    if ((authLevel != null) && (authLevel.toInt() > 0)) {
+                        styledSpan {
+                            button {
+                                Link {
+                                    attrs.to = "/book-edit/${props.id}"
+                                    editOutlined { }
+                                }
+                            }
+                        }
+                        styledSpan {
+                            button {
+                                attrs.danger = true
+                                attrs.type = "primary"
+                                deleteOutlined { }
+                            }
+                        }
+                    }
                 }
                 descriptions {
                     attrs.column = 1

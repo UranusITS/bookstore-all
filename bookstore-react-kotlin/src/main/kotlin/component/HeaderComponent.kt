@@ -42,34 +42,47 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
         )
     }
 
-    private val menu = buildElement {
-        menu {
-            menuItem {
-                userOutlined { }
-                +"个人信息"
-            }
-            menuItem {
-                Link {
-                    attrs.to = "/cart"
-                    shoppingCartOutlined { }
-                    +"购物车"
+    private fun buildMenu(is_admin: Boolean): ReactElement<*> {
+        val menu = buildElement {
+            menu {
+                menuItem {
+                    userOutlined { }
+                    +"个人信息"
                 }
-            }
-            menuItem {
-                logoutOutlined { }
-                +"退出登录"
-                attrs.onClick = {
-                    localStorage.setItem("id", "")
-                    localStorage.setItem("name", "")
-                    localStorage.setItem("authLevel", "")
-                    setState {
-                        user = User(-1, "", "", -1)
-                        isAuthored = false
-                        isModalVisible = false
+                menuItem {
+                    Link {
+                        attrs.to = "/cart"
+                        shoppingCartOutlined { }
+                        +"购物车"
+                    }
+                }
+                if (is_admin) {
+                    menuItem {
+                        attrs.disabled = false
+                        Link {
+                            attrs.to = "/admin"
+                            settingOutlined { }
+                            +"后台管理"
+                        }
+                    }
+                }
+                menuItem {
+                    logoutOutlined { }
+                    +"退出登录"
+                    attrs.onClick = {
+                        localStorage.setItem("id", "")
+                        localStorage.setItem("name", "")
+                        localStorage.setItem("authLevel", "")
+                        setState {
+                            user = User(-1, "", "", -1)
+                            isAuthored = false
+                            isModalVisible = false
+                        }
                     }
                 }
             }
         }
+        return menu
     }
 
     override fun componentDidMount() {
@@ -107,6 +120,19 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                 .await()
         val user = Json.decodeFromString<User>(response)
         if (user.id != -1) {
+            if (user.auth_level < 0) {
+                message.error("您的账号已经被禁用")
+                setState(
+                    HeaderState(
+                        User(-1, "", "", -1),
+                        typedInName = "",
+                        typedInPassword = "",
+                        isAuthored = false,
+                        isModalVisible = false
+                    )
+                )
+                return
+            }
             message.success("登录成功")
             localStorage.setItem("id", user.id.toString())
             localStorage.setItem("name", user.username)
@@ -126,6 +152,14 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
     }
 
     private suspend fun register() {
+        if (state.typedInName.isEmpty()) {
+            message.error("请输入用户名")
+            return
+        }
+        if (state.typedInPassword.length < 6) {
+            message.error("密码长度不短于6位")
+            return
+        }
         val response =
             window.fetch(
                 "http://localhost:8080/user/register?" +
@@ -204,7 +238,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                 div {
                     attrs.style = js { float = "right" }
                     dropdown {
-                        attrs.overlay = menu
+                        attrs.overlay = buildMenu(state.user.auth_level > 0)
                         button {
                             +"Hello, ${state.user.username}"
                             downOutlined { }

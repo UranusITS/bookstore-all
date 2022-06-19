@@ -46,7 +46,7 @@ class CartItemComponent(props: CartItemProps) : RComponent<CartItemProps, CartIt
 
     private val numInputChangeHandler: ChangeEventHandler<HTMLInputElement> = {
         val num = it.asDynamic() as Int
-        console.log(num)
+        //console.log(num)
         GlobalScope.launch {
             window.fetch("http://localhost:8080/cart-item/update-num?id=${state.cartItem.id}&num=$num")
                 .then { props.onPriceChange() }

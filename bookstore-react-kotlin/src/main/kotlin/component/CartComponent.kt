@@ -200,12 +200,12 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
                 }
             }
             row {
-                attrs.style = kotlinext.js.js { marginTop = 64 }
+                attrs.style = js { marginTop = 64 }
                 attrs.gutter = 24
                 col {
                     card {
                         attrs.bordered = true
-                        attrs.style = kotlinext.js.js {
+                        attrs.style = js {
                             margin = "0 auto"
                             width = 1200
                         }

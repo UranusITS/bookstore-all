@@ -1,3 +1,4 @@
+import page.bookEditPage
 import page.bookPage
 import page.cartPage
 import page.homePage
@@ -21,6 +22,13 @@ class BasicRoute(props: Props) : RComponent<Props, State>(props) {
                 Route {
                     attrs.path = "book"
                     attrs.element = createElement(bookPage)
+                    Route {
+                        attrs.path = ":bookId"
+                    }
+                }
+                Route {
+                    attrs.path = "book-edit"
+                    attrs.element = createElement(bookEditPage)
                     Route {
                         attrs.path = ":bookId"
                     }
