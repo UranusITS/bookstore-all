@@ -1,7 +1,4 @@
-import page.bookEditPage
-import page.bookPage
-import page.cartPage
-import page.homePage
+import page.*
 import react.*
 import react.router.Route
 import react.router.Routes
@@ -18,6 +15,10 @@ class BasicRoute(props: Props) : RComponent<Props, State>(props) {
                 Route {
                     attrs.path = "cart"
                     attrs.element = createElement(cartPage)
+                }
+                Route {
+                    attrs.path = "admin"
+                    attrs.element = createElement(adminPage)
                 }
                 Route {
                     attrs.path = "book"

@@ -1,14 +1,19 @@
 package team.solar.bookstorebackend.controller
 
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import team.solar.bookstorebackend.entity.Book
 import team.solar.bookstorebackend.entity.User
 import team.solar.bookstorebackend.service.UserService
 
 @RestController
 @RequestMapping("/user")
 class UserController(val service: UserService) {
+    @RequestMapping("/users")
+    fun findAll(): List<User> = service.findAll()
+
     @RequestMapping("/login")
     fun login(@RequestParam("username") username: String, @RequestParam("password") password: String): User {
         val user = service.getUserByUsernameAndPassword(username, password)
@@ -22,4 +27,7 @@ class UserController(val service: UserService) {
         else
             service.addUser(User(null, username, password, 0))
     }
+
+    @RequestMapping("/update-user-auth")
+    fun updateBook(@RequestBody user: User) = service.updateUserAuth(user)
 }
