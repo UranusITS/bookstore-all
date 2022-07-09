@@ -7,14 +7,14 @@ import team.solar.bookstorebackend.repository.UserRepository
 
 @Repository
 class UserDaoImpl(val repo: UserRepository) : UserDao {
-    override fun findAll(): List<User> = repo.findAll().toList()
+    override fun getUserById(id: Int?) = repo.getUserById(id)
 
-    override fun getUserByUsernameAndPassword(username: String, password: String): User? =
+    override fun findAll() = repo.findAll().toList()
+
+    override fun getUserByUsernameAndPassword(username: String?, password: String?) =
         repo.getUserByUsernameAndPassword(username, password)
 
-    override fun countUsersByUsername(username: String): Int = repo.countUsersByUsername(username)
+    override fun countUsersByUsername(username: String?) = repo.countUsersByUsername(username)
 
     override fun save(user: User) = repo.save(user)
-
-    override fun updateAuthById(id: Int, auth_level: Int) = repo.updateAuthById(id, auth_level)
 }

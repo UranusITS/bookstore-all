@@ -1,6 +1,7 @@
 package team.solar.bookstorebackend.service
 
 import team.solar.bookstorebackend.entity.Address
+import team.solar.bookstorebackend.entity.User
 
 interface AddressService {
     fun getAddressById(id: Int): Address?

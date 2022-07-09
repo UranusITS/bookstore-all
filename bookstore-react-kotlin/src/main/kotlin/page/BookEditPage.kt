@@ -5,6 +5,7 @@ import antd.layout.layout
 import component.*
 import data.Book
 import data.BookProps
+import data.getBookById
 import kotlinext.js.js
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
@@ -41,11 +42,7 @@ val bookEditPage = fc<BookProps> { props ->
                     } else {
                         var book: Book? by useState(null)
                         GlobalScope.launch {
-                            val response = window.fetch("http://localhost:8080/book/get-book-by-id?id=$bookId")
-                                .await()
-                                .text()
-                                .await()
-                            book = Json.decodeFromString(response)
+                            book = getBookById(bookId)
                         }
                         if (book != null) {
                             localStorage.setItem("editBookId", bookId.toString())

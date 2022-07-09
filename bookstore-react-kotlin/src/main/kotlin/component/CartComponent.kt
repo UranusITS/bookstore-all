@@ -20,6 +20,7 @@ import kotlinext.js.js
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.css.*
@@ -49,13 +50,16 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
     }
 
     override fun componentDidMount() {
-        val userID = localStorage.getItem("id")
-        val newInputAddress = state.inputAddress
-        newInputAddress.user_id = userID!!.toInt()
-        setState { inputAddress = newInputAddress }
-        GlobalScope.launch {
-            fetchCartItems()
-            fetchAddress()
+        val user = getLocalUser()
+        if (user != null) {
+            val newInputAddress = state.inputAddress
+            newInputAddress.user = user
+            setState { inputAddress = newInputAddress }
+            GlobalScope.launch {
+                fetchCartItems()
+                val address = getAddress(user)
+                setState { addressList = address }
+            }
         }
     }
 
@@ -89,84 +93,44 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
         setState { selectedAddressID = value }
     }
 
-    private suspend fun fetchCartItems() {
-        val userID = localStorage.getItem("id")
-        val response = window.fetch("http://localhost:8080/cart-item/items?user-id=$userID")
-            .await()
-            .text()
-            .await()
-        val newCartItemList = Json.decodeFromString<List<CartItem>>(response)
-        var newPriceTotal = .0
-        for (cartItem in newCartItemList) {
-            if (cartItem.checked) {
-                val bookResponse = window.fetch("http://localhost:8080/book/get-book-by-id?id=${cartItem.book_id}")
-                    .await()
-                    .text()
-                    .await()
-                val bookPrice = Json.decodeFromString<Book>(bookResponse).price
-                newPriceTotal += cartItem.num * bookPrice
-            }
-        }
-        setState {
-            cartItemList = newCartItemList
-            priceTotal = newPriceTotal
-        }
-    }
-
-    private suspend fun fetchAddress() {
-        val userID = localStorage.getItem("id")
-        val response = window.fetch("http://localhost:8080/address/get-address-by-user-id?user-id=$userID")
-            .await()
-            .text()
-            .await()
-        val newAddressList = Json.decodeFromString<List<Address>>(response)
-        setState { addressList = newAddressList }
-    }
-
-    private suspend fun addAddress() {
-        val headers = Headers()
-        headers.append("Content-Type", "application/json;charset=UTF-8")
-        window.fetch(
-            "http://localhost:8080/address/add-address",
-            RequestInit(method = "POST", headers = headers, body = Json.encodeToString(state.inputAddress))
-        ).await()
-        fetchAddress()
-    }
-
     private suspend fun addOrder() {
-        val userID = localStorage.getItem("id")!!.toInt()
-        val order = Order(null, userID, state.selectedAddressID)
-        if (order.address_id == -1) {
+        if (state.selectedAddressID == -1) {
             message.error("请先选择地址")
             return
         }
-        val headers = Headers()
-        headers.append("Content-Type", "application/json;charset=UTF-8")
-        val orderID = window.fetch(
-            "http://localhost:8080/order/add-order",
-            RequestInit(method = "POST", headers = headers, body = Json.encodeToString(order))
-        )
-            .await()
-            .text()
-            .await()
-            .toInt()
+        val user = getLocalUser()
+        if (user == null) {
+            message.error("请先登录")
+            return
+        }
         val orderItemList = mutableListOf<OrderItem>()
         for (item in state.cartItemList) {
-            val response = window.fetch("http://localhost:8080/book/get-book-by-id?id=${item.book_id}")
-                .await()
-                .text()
-                .await()
-            val book = Json.decodeFromString<Book>(response)
-            orderItemList.add(OrderItem(null, orderID, book.name, book.author, book.price, item.num, book.img_path))
+            val book = getBookById(item.book!!.id!!)!!
+            orderItemList.add(OrderItem(null, null, book.name, book.author, book.price, item.num, book.img_path))
         }
-        window.fetch(
-            "http://localhost:8080/order-item/add-items",
-            RequestInit(method = "POST", headers = headers, body = Json.encodeToString(orderItemList))
-        )
+        val order = Order(user = user, address = Address(id = state.selectedAddressID), orderItems = orderItemList)
+        addOrder(order)
         message.success("下单成功")
-        window.fetch("http://localhost:8080/cart-item/delete-item?user-id=$userID")
-            .await()
+        clearCartItems(user)
         fetchCartItems()
+    }
+
+    private suspend fun fetchCartItems() {
+        val user = getLocalUser()
+        if (user != null) {
+            val cartItems = getCartItems(user)
+            var newPriceTotal = .0
+            for (cartItem in cartItems) {
+                if (cartItem.checked == true) {
+                    val book = cartItem.book
+                    newPriceTotal += book?.price?.let { cartItem.num?.times(it) } ?: 0.0
+                }
+            }
+            setState {
+                cartItemList = cartItems
+                priceTotal = newPriceTotal
+            }
+        }
     }
 
     private val priceChangeHandler = {
@@ -184,109 +148,119 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
             row {
                 attrs.gutter = 24
                 for (item in state.cartItemList) {
+                    console.log(item)
                     col {
                         attrs.span = 24
                         child(CartItemComponent::class) {
                             attrs {
                                 id = item.id
-                                userId = item.user_id
-                                bookId = item.book_id
-                                num = item.num
-                                checked = item.checked
+                                userId = item.user!!.id!!
+                                bookId = item.book!!.id!!
+                                num = item.num!!
+                                checked = item.checked!!
                                 onPriceChange = priceChangeHandler
                             }
                         }
                     }
                 }
             }
-            row {
-                attrs.style = js { marginTop = 64 }
-                attrs.gutter = 24
-                col {
-                    card {
-                        attrs.bordered = true
-                        attrs.style = js {
-                            margin = "0 auto"
-                            width = 1200
-                        }
-                        styledDiv {
-                            css {
-                                +SettlementItemStyles.inline
-                                +SettlementItemStyles.bottomMargin
-                            }
-                            styledP {
-                                css { +SettlementItemStyles.bottomMargin }
-                                +"总价："
-                            }
-                        }
-                        styledDiv {
-                            css {
-                                +SettlementItemStyles.inline
-                                +SettlementItemStyles.bottomMargin
-                                width = 200.px
-                            }
-                            styledP {
-                                css {
-                                    +SettlementItemStyles.bottomMargin
-                                    color = Color.red
-                                    fontSize = 18.pt
-                                }
-                                var priceTotal = (state.priceTotal * 100).roundToInt().toDouble() / 100
-                                +"￥${priceTotal}"
-                            }
-                        }
-                        styledDiv {
-                            css {
-                                +SettlementItemStyles.inline
-                                +SettlementItemStyles.bottomMargin
+            if (state.cartItemList.isEmpty()) {
+                errorComponent {
+                    attrs {
+                        errorCode = 404
+                        extraInfo = "购物车为空"
+                    }
+                }
+            } else {
+                row {
+                    attrs.style = js { marginTop = 64 }
+                    attrs.gutter = 24
+                    col {
+                        card {
+                            attrs.bordered = true
+                            attrs.style = js {
+                                margin = "0 auto"
+                                width = 1200
                             }
                             styledDiv {
                                 css {
-                                    width = 800.px
-                                    textAlign = TextAlign.right
+                                    +SettlementItemStyles.inline
+                                    +SettlementItemStyles.bottomMargin
                                 }
-                                styledSpan {
+                                styledP {
+                                    css { +SettlementItemStyles.bottomMargin }
+                                    +"总价："
+                                }
+                            }
+                            styledDiv {
+                                css {
+                                    +SettlementItemStyles.inline
+                                    +SettlementItemStyles.bottomMargin
+                                    width = 200.px
+                                }
+                                styledP {
                                     css {
-                                        marginRight = 16.px
+                                        +SettlementItemStyles.bottomMargin
+                                        color = Color.red
+                                        fontSize = 18.pt
                                     }
-                                    select<Int, SelectComponent<Int>> {
-                                        attrs.style = js { width = 480.px }
-                                        attrs.onChange = addressSelectChangHandler
-                                        for (address in state.addressList) {
-                                            option {
-                                                attrs.value = address.id!!
-                                                +address.toAddressItem()
-                                            }
-                                        }
-                                    }
+                                    val priceTotal = (state.priceTotal * 100).roundToInt().toDouble() / 100
+                                    +"￥${priceTotal}"
                                 }
-                                styledSpan {
+                            }
+                            styledDiv {
+                                css {
+                                    +SettlementItemStyles.inline
+                                    +SettlementItemStyles.bottomMargin
+                                }
+                                styledDiv {
                                     css {
-                                        marginRight = 56.px
+                                        width = 800.px
+                                        textAlign = TextAlign.right
                                     }
-                                    button {
-                                        attrs.size = "small"
-                                        attrs.onClick = { showModal() }
-                                        plusOutlined { }
-                                    }
-                                }
-                                styledSpan {
-                                    button {
-                                        attrs {
-                                            style = js {
-                                                width = 160.px
-                                                margin = "0 auto"
-                                            }
-                                            type = "primary"
-                                            size = "large"
+                                    styledSpan {
+                                        css {
+                                            marginRight = 16.px
                                         }
-                                        attrs.onClick = {
-                                            GlobalScope.launch {
-                                                addOrder()
+                                        select<Int, SelectComponent<Int>> {
+                                            attrs.style = js { width = 480.px }
+                                            attrs.onChange = addressSelectChangHandler
+                                            for (address in state.addressList) {
+                                                option {
+                                                    attrs.value = address.id!!
+                                                    +address.toAddressItem()
+                                                }
                                             }
                                         }
-                                        payCircleOutlined { }
-                                        +"立即购买"
+                                    }
+                                    styledSpan {
+                                        css {
+                                            marginRight = 56.px
+                                        }
+                                        button {
+                                            attrs.size = "small"
+                                            attrs.onClick = { showModal() }
+                                            plusOutlined { }
+                                        }
+                                    }
+                                    styledSpan {
+                                        button {
+                                            attrs {
+                                                style = js {
+                                                    width = 160.px
+                                                    margin = "0 auto"
+                                                }
+                                                type = "primary"
+                                                size = "large"
+                                            }
+                                            attrs.onClick = {
+                                                GlobalScope.launch {
+                                                    addOrder()
+                                                }
+                                            }
+                                            payCircleOutlined { }
+                                            +"立即购买"
+                                        }
                                     }
                                 }
                             }
@@ -326,8 +300,13 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
                             attrs.block = true
                             attrs.type = "primary"
                             attrs.onClick = {
-                                GlobalScope.launch {
-                                    addAddress()
+                                val user = getLocalUser()
+                                if (user != null) {
+                                    GlobalScope.launch {
+                                        addAddress(state.inputAddress)
+                                        val address = getAddress(user)
+                                        setState { addressList = address }
+                                    }
                                 }
                                 modalCancel()
                                 message.success("添加成功")

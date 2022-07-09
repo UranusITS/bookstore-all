@@ -5,13 +5,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import team.solar.bookstorebackend.entity.CartItem
+import team.solar.bookstorebackend.entity.User
 import team.solar.bookstorebackend.service.CartItemService
 
 @RestController
 @RequestMapping("/cart-item")
 class CartItemController(val service: CartItemService) {
     @RequestMapping("/items")
-    fun getItemsByUserId(@RequestParam("user-id") user_id: Int) = service.getItemsByUserID(user_id)
+    fun getItemsByUserId(@RequestParam("user-id") user_id: Int) = service.getItemsByUserId(user_id)
 
     @RequestMapping("/update-num")
     fun increaseNumById(@RequestParam("id") id: Int, @RequestParam("num") num: Int) = service.updateNumById(id, num)

@@ -1,15 +1,21 @@
 package team.solar.bookstorebackend.entity
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
+import javax.persistence.*
 
-@Table("order_items")
-data class OrderItem(
-    @Id val id: Int?,
-    val order_id: Int,
-    val name: String,
-    val author: String,
-    val price: Double,
-    val num: Int,
-    val img_path: String
+@Entity
+@Table(name = "order_items")
+class OrderItem(
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    @Id val id: Int? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    @JsonIgnore
+    var order: Order? = null,
+    val name: String? = null,
+    val author: String? = null,
+    val price: Double? = null,
+    val num: Int? = null,
+    val img_path: String? = null
 )

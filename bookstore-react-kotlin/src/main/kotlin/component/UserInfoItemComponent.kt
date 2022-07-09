@@ -15,6 +15,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.fetch.Headers
@@ -36,7 +37,8 @@ class UserInfoItemComponent(props: UserProps) : RComponent<UserProps, UserState>
     }
 
     override fun RBuilder.render() {
-        val adminLevel = localStorage.getItem("authLevel")!!.toInt()
+        val user = Json.decodeFromString<User>(localStorage.getItem("user")!!)
+        val adminLevel = user.auth_level!!
         styledDiv {
             card {
                 attrs.bordered = true
@@ -115,7 +117,7 @@ class UserInfoItemComponent(props: UserProps) : RComponent<UserProps, UserState>
                                 val headers = Headers()
                                 headers.append("Content-Type", "application/json;charset=UTF-8")
                                 val response = window.fetch(
-                                    "http://localhost:8080/user/update-user-auth",
+                                    "$backendUrl/user/update-user-auth",
                                     RequestInit(
                                         method = "POST",
                                         headers = headers,
@@ -145,7 +147,7 @@ class UserInfoItemComponent(props: UserProps) : RComponent<UserProps, UserState>
                                 val headers = Headers()
                                 headers.append("Content-Type", "application/json;charset=UTF-8")
                                 val response = window.fetch(
-                                    "http://localhost:8080/user/delete",
+                                    "$backendUrl/user/delete",
                                     RequestInit(
                                         method = "POST",
                                         headers = headers,

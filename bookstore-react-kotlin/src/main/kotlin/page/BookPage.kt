@@ -8,13 +8,16 @@ import component.HeaderComponent
 import component.errorComponent
 import data.Book
 import data.BookProps
+import data.getBookById
 import kotlinext.js.js
+import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import react.createRef
 import react.dom.div
 import react.fc
 import react.router.useParams
@@ -23,7 +26,7 @@ import style.BookDetailStyles
 import styled.css
 import styled.styledDiv
 
-val bookPage = fc<BookProps> { props ->
+val bookPage = fc<BookProps> { _ ->
     val params = useParams()
     val bookId = params["bookId"]?.toInt()
     div {
@@ -43,24 +46,20 @@ val bookPage = fc<BookProps> { props ->
                     } else {
                         var book: Book? by useState(null)
                         GlobalScope.launch {
-                            val response = window.fetch("http://localhost:8080/book/get-book-by-id?id=$bookId")
-                                .await()
-                                .text()
-                                .await()
-                            book = Json.decodeFromString(response)
+                            book = getBookById(bookId)
                         }
                         if (book != null) {
                             BookDetailComponent {
                                 attrs {
-                                    id = book!!.id
-                                    isbn = book!!.isbn
-                                    name = book!!.name
-                                    type = book!!.type
-                                    author = book!!.author
-                                    price = book!!.price
-                                    description = book!!.description
-                                    inventory = book!!.inventory
-                                    imgPath = book!!.img_path
+                                    id = book!!.id!!
+                                    isbn = book!!.isbn!!
+                                    name = book!!.name!!
+                                    booktype = book!!.type!!
+                                    author = book!!.author!!
+                                    price = book!!.price!!
+                                    description = book!!.description!!
+                                    inventory = book!!.inventory!!
+                                    imgPath = book!!.img_path!!
                                 }
                             }
                         } else {

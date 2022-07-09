@@ -1,27 +1,22 @@
 package team.solar.bookstorebackend.repository
 
-import org.springframework.data.jdbc.repository.query.Modifying
-import org.springframework.data.jdbc.repository.query.Query
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.query.Param
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.stereotype.Repository
+import team.solar.bookstorebackend.entity.Book
 import team.solar.bookstorebackend.entity.CartItem
+import team.solar.bookstorebackend.entity.User
+import javax.transaction.Transactional
 
-interface CartItemRepository : CrudRepository<CartItem, Int> {
-    @Query("select * from cart_items where user_id = :user_id")
-    fun getItemsByUserID(@Param("user_id") user_id: Int): List<CartItem>
+@Repository
+interface CartItemRepository : JpaRepository<CartItem, Int>, JpaSpecificationExecutor<CartItem> {
+    fun getCartItemById(id: Int): CartItem?
 
-    @Query("select count(*) from cart_items where user_id = :user_id and book_id = :book_id")
-    fun countCartItemByUserIdAnAndBookId(@Param("user_id") user_id: Int, @Param("book_id") book_id: Int): Int
+    fun getCartItemsByUser(user: User): List<CartItem>?
 
-    @Modifying
-    @Query("update cart_items set num = :num where id = :id")
-    fun updateNumById(@Param("id") id: Int, @Param("num") num: Int)
-
-    @Modifying
-    @Query("update cart_items set checked = :checked where id = :id")
-    fun updateCheckedById(@Param("id") id: Int, @Param("checked") checked: Boolean)
+    fun countCartItemByUserAndBook(user: User?, book: Book?): Int
 
     @Modifying
-    @Query("delete from cart_items where user_id = :user_id and checked = true")
-    fun deleteByUserId(@Param("user_id") user_id: Int)
+    fun deleteByUser(user: User)
 }

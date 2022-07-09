@@ -17,6 +17,10 @@ class BasicRoute(props: Props) : RComponent<Props, State>(props) {
                     attrs.element = createElement(cartPage)
                 }
                 Route {
+                    attrs.path = "order"
+                    attrs.element = createElement(orderPage)
+                }
+                Route {
                     attrs.path = "admin"
                     attrs.element = createElement(adminPage)
                 }

@@ -21,20 +21,36 @@ class BookServiceImpl(val dao: BookDao) : BookService {
         return re.toList()
     }
 
-    override fun getBooksByText(text: String) = dao.getBooksByText(text)
+    override fun getBooksByText(text: String): List<Book> {
+        val books = mutableListOf<Book>()
+        books.addAll(dao.getBooksByName(text))
+        books.addAll(dao.getBooksByAuthor(text))
+        books.addAll(dao.getBooksByDescription(text))
+        return books.toSet().toList()
+    }
 
     override fun getBookById(id: Int) = dao.getBookById(id)
 
-    override fun increaseInventory(id: Int, num: Int) = dao.increaseInventoryById(id, num)
+    override fun increaseInventory(id: Int, num: Int) {
+        val book = dao.getBookById(id)
+        if (book != null) {
+            book.inventory = book.inventory?.plus(num)
+            dao.save(book)
+        }
+    }
 
-    override fun decreaseInventory(id: Int, num: Int) = dao.decreaseInventoryById(id, num)
+    override fun decreaseInventory(id: Int, num: Int) {
+        val book = dao.getBookById(id)
+        if (book != null) {
+            book.inventory = book.inventory?.minus(num)
+            dao.save(book)
+        }
+    }
 
     override fun updateBook(book: Book) {
-        book.id?.let {
-            dao.updateAllById(
-                it, book.isbn, book.name, book.type, book.author, book.price,
-                book.description, book.inventory, book.img_path
-            )
+        val oldBook = dao.getBookById(book.id)
+        if (oldBook != null) {
+            dao.save(book)
         }
     }
 

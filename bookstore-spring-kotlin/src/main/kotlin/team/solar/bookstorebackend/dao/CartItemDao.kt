@@ -1,17 +1,17 @@
 package team.solar.bookstorebackend.dao
 
+import team.solar.bookstorebackend.entity.Book
 import team.solar.bookstorebackend.entity.CartItem
+import team.solar.bookstorebackend.entity.User
 
 interface CartItemDao {
-    fun getItemsByUserID(user_id: Int): List<CartItem>
+    fun getCartItemById(id: Int): CartItem?
 
-    fun countCartItemByUserIdAnAndBookId(user_id: Int, book_id: Int): Int
+    fun getItemsByUser(user: User): List<CartItem>?
 
-    fun updateNumById(id: Int, num: Int)
+    fun countCartItemByUserAndBook(user: User?, book: Book?): Int
 
-    fun updateCheckedById(id: Int, checked: Boolean)
-
-    fun deleteByUserId(user_id: Int)
+    fun deleteByUser(user: User)
 
     fun save(cart_item: CartItem): CartItem
 }

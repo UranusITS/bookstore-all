@@ -9,16 +9,17 @@ import team.solar.bookstorebackend.service.UserService
 @Service
 class UserServiceImpl(val dao: UserDao) : UserService {
     override fun findAll(): List<User> = dao.findAll()
-    override fun getUserByUsernameAndPassword(username: String, password: String) =
+    override fun getUserByUsernameAndPassword(username: String?, password: String?) =
         dao.getUserByUsernameAndPassword(username, password)
 
-    override fun countUsersByUsername(username: String) = dao.countUsersByUsername(username)
+    override fun countUsersByUsername(username: String?) = dao.countUsersByUsername(username)
 
     override fun addUser(user: User) = dao.save(user)
 
     override fun updateUserAuth(user: User) {
-        user.id?.let {
-            dao.updateAuthById(it, user.auth_level)
+        val oldUser = dao.getUserById(user.id)
+        if (oldUser != null) {
+            dao.save(user)
         }
     }
 }

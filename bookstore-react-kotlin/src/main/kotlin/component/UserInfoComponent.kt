@@ -3,6 +3,8 @@ package component
 import antd.grid.col
 import antd.grid.row
 import data.UserInfoState
+import data.backendUrl
+import data.getAllUsers
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
@@ -17,17 +19,11 @@ class UserInfoComponent(props: Props) : RComponent<Props, UserInfoState>(props) 
         state = UserInfoState(listOf())
     }
 
-    private suspend fun fetchUserList() {
-        val response = window.fetch("http://localhost:8080/user/users")
-            .await()
-            .text()
-            .await()
-        setState { users = Json.decodeFromString(response) }
-    }
-
     override fun componentDidMount() {
         GlobalScope.launch {
-            fetchUserList()
+            val tmpUsers = getAllUsers()
+            console.log(tmpUsers)
+            setState { users = tmpUsers }
         }
     }
 
@@ -35,13 +31,14 @@ class UserInfoComponent(props: Props) : RComponent<Props, UserInfoState>(props) 
         row {
             attrs.gutter = 24
             for (item in state.users) {
+                console.log(item)
                 col {
                     attrs.span = 24
                     child(UserInfoItemComponent::class) {
                         attrs {
-                            id = item.id
-                            username = item.username
-                            authLevel = item.auth_level
+                            id = item.id!!
+                            username = item.username!!
+                            authLevel = item.auth_level!!
                         }
                     }
                 }

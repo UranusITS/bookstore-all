@@ -9,18 +9,13 @@ interface BookDao {
 
     fun getBooksByType(type: String): List<Book>
 
-    fun getBooksByText(text: String): List<Book>
+    fun getBooksByName(name: String): List<Book>
 
-    fun getBookById(id: Int): Book?
+    fun getBooksByAuthor(author: String): List<Book>
 
-    fun increaseInventoryById(id: Int, num: Int)
+    fun getBooksByDescription(description: String): List<Book>
 
-    fun decreaseInventoryById(id: Int, num: Int)
-
-    fun updateAllById(
-        id: Int, isbn: String, name: String, type: String, author: String, price: Double,
-        description: String, inventory: Int, img_path: String
-    )
+    fun getBookById(id: Int?): Book?
 
     fun save(book: Book): Book
 

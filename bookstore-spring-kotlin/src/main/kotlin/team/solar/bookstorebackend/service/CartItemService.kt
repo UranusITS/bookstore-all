@@ -1,9 +1,10 @@
 package team.solar.bookstorebackend.service
 
 import team.solar.bookstorebackend.entity.CartItem
+import team.solar.bookstorebackend.entity.User
 
 interface CartItemService {
-    fun getItemsByUserID(user_id: Int): List<CartItem>
+    fun getItemsByUserId(user_id: Int): List<CartItem>?
 
     fun updateNumById(id: Int, num: Int)
 

@@ -7,24 +7,14 @@ import antd.grid.col
 import antd.grid.row
 import antd.icon.*
 import antd.message.message
-import data.BookProps
-import data.CartItem
+import data.*
 import kotlinext.js.js
-import kotlinx.browser.localStorage
-import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.css.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.w3c.fetch.Headers
-import org.w3c.fetch.RequestInit
-import react.buildElement
-import react.fc
+import react.*
 import react.router.dom.Link
 import style.BookDetailStyles
-import style.SettlementItemStyles
 import styled.css
 import styled.styledDiv
 import styled.styledImg
@@ -50,8 +40,8 @@ val BookDetailComponent = fc<BookProps> { props ->
                         css { +BookDetailStyles.bookName }
                         +props.name
                     }
-                    val authLevel = localStorage.getItem("authLevel")
-                    if ((authLevel != null) && (authLevel.toInt() > 0)) {
+                    val user = getLocalUser()
+                    if ((user != null) && (user.auth_level != null) && (user.auth_level.toInt() > 0)) {
                         styledSpan {
                             button {
                                 Link {
@@ -64,7 +54,15 @@ val BookDetailComponent = fc<BookProps> { props ->
                             button {
                                 attrs.danger = true
                                 attrs.type = "primary"
-                                deleteOutlined { }
+                                Link {
+                                    attrs.to = "/"
+                                    deleteOutlined { }
+                                }
+                                attrs.onClick = {
+                                    GlobalScope.launch {
+                                        deleteBookById(props.id)
+                                    }
+                                }
                             }
                         }
                     }
@@ -79,7 +77,7 @@ val BookDetailComponent = fc<BookProps> { props ->
                     }
                     descriptionsItem {
                         attrs.label = "分类"
-                        styledSpan { +props.type }
+                        styledSpan { +props.booktype }
                     }
                     descriptionsItem {
                         attrs.label = "定价"
@@ -124,27 +122,13 @@ val BookDetailComponent = fc<BookProps> { props ->
                                 type = "primary"
                                 size = "large"
                                 onClick = {
-                                    val userId = localStorage.getItem("id")
-                                    if (userId == null || userId.toInt() == -1) {
+                                    val user = getLocalUser()
+                                    if (user == null) {
                                         message.error("请先登录")
                                     } else {
                                         GlobalScope.launch {
-                                            val headers = Headers()
-                                            headers.append("Content-Type", "application/json;charset=UTF-8")
-                                            val cartItem = CartItem(null, userId.toInt(), props.id, 1, true)
-                                            val response = window.fetch(
-                                                "http://localhost:8080/cart-item/add-item",
-                                                RequestInit(
-                                                    method = "POST",
-                                                    headers = headers,
-                                                    body = Json.encodeToString(cartItem)
-                                                )
-                                            )
-                                                .await()
-                                                .text()
-                                                .await()
-                                                .toBoolean()
-                                            if (response) {
+                                            val flag = addCartItem(user, Book(props))
+                                            if (flag) {
                                                 message.success("加入购物车成功")
                                             } else {
                                                 message.info("已在购物车中")

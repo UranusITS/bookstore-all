@@ -14,18 +14,13 @@ class BookDaoImpl(val repo: BookRepository) : BookDao {
 
     override fun getBooksByType(type: String) = repo.getBooksByType(type)
 
-    override fun getBooksByText(text: String) = repo.getBooksByText(text)
+    override fun getBooksByName(name: String) = repo.getBooksByName(name)
 
-    override fun getBookById(id: Int) = repo.getBookById(id)
+    override fun getBooksByAuthor(author: String) = repo.getBooksByAuthor(author)
 
-    override fun increaseInventoryById(id: Int, num: Int) = repo.increaseInventoryById(id, num)
+    override fun getBooksByDescription(description: String) = repo.getBooksByDescription(description)
 
-    override fun decreaseInventoryById(id: Int, num: Int) = repo.decreaseInventoryById(id, num)
-
-    override fun updateAllById(
-        id: Int, isbn: String, name: String, type: String, author: String, price: Double,
-        description: String, inventory: Int, img_path: String
-    ) = repo.updateAllById(id, isbn, name, type, author, price, description, inventory, img_path)
+    override fun getBookById(id: Int?) = repo.getBookById(id)
 
     override fun save(book: Book) = repo.save(book)
 

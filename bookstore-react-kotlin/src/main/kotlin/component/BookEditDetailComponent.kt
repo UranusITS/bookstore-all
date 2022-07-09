@@ -6,9 +6,7 @@ import antd.grid.col
 import antd.grid.row
 import antd.icon.*
 import antd.input.input
-import antd.input.password
 import antd.input.textArea
-import antd.inputnumber.inputNumber
 import antd.message.message
 import antd.space.space
 import data.*
@@ -33,24 +31,20 @@ import styled.styledDiv
 import styled.styledSpan
 
 
-class BookEditDetailComponent(props: Props) : RComponent<Props, BookEditState>(props) {
+class BookEditDetailComponent(props: Props) : RComponent<Props, BookState>(props) {
     init {
-        state = BookEditState()
-    }
-
-    private suspend fun fetchBook() {
-        val bookId = localStorage.getItem("editBookId")
-        val response = window.fetch("http://localhost:8080/book/get-book-by-id?id=$bookId")
-            .await()
-            .text()
-            .await()
-        var book: Book = Json.decodeFromString(response)
-        setState(BookEditState(book))
+        state = BookState()
     }
 
     override fun componentDidMount() {
         GlobalScope.launch {
-            fetchBook()
+            val bookId = localStorage.getItem("editBookId")
+            if (bookId != null) {
+                val book = getBookById(bookId.toInt())
+                if (book != null) {
+                    setState(BookState(book))
+                }
+            }
         }
     }
 
@@ -235,19 +229,7 @@ class BookEditDetailComponent(props: Props) : RComponent<Props, BookEditState>(p
                                     size = "large"
                                     onClick = {
                                         GlobalScope.launch {
-                                            val headers = Headers()
-                                            headers.append("Content-Type", "application/json;charset=UTF-8")
-                                            val response = window.fetch(
-                                                "http://localhost:8080/book/update-book",
-                                                RequestInit(
-                                                    method = "POST",
-                                                    headers = headers,
-                                                    body = Json.encodeToString(Book(state))
-                                                )
-                                            )
-                                                .await()
-                                                .text()
-                                                .await()
+                                            updateBook(Book(state))
                                             message.success("保存成功")
                                         }
                                     }

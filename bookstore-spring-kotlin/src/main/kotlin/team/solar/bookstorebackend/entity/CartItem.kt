@@ -1,13 +1,19 @@
 package team.solar.bookstorebackend.entity
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Table
+import javax.persistence.*
 
-@Table("cart_items")
-data class CartItem(
-    @Id val id: Int?,
-    val user_id: Int,
-    val book_id: Int,
-    val num: Int,
-    val checked: Boolean
+@Entity
+@Table(name = "cart_items")
+class CartItem(
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    @Id val id: Int? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    val user: User? = null,
+    @OneToOne
+    @JoinColumn(name = "book_id", referencedColumnName = "id")
+    val book: Book? = null,
+    var num: Int? = null,
+    var checked: Boolean? = null
 )

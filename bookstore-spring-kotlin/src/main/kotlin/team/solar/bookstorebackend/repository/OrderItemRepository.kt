@@ -1,11 +1,12 @@
 package team.solar.bookstorebackend.repository
 
-import org.springframework.data.jdbc.repository.query.Query
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.query.Param
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.stereotype.Repository
+import team.solar.bookstorebackend.entity.Order
 import team.solar.bookstorebackend.entity.OrderItem
 
-interface OrderItemRepository : CrudRepository<OrderItem, Int> {
-    @Query("select * from order_items where order_id = :order_id")
-    fun getItemsByOrderID(@Param("order_id") order_id: Int): List<OrderItem>
+@Repository
+interface OrderItemRepository : JpaRepository<OrderItem, Int>, JpaSpecificationExecutor<OrderItem> {
+    fun getOrderItemsByOrder(order: Order): List<OrderItem>?
 }

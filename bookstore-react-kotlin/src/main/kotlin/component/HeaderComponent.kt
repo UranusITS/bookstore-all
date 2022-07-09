@@ -13,7 +13,7 @@ import antd.message.message
 import antd.modal.modal
 import antd.space.space
 import data.HeaderState
-import data.User
+import data.*
 import kotlinext.js.js
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
@@ -46,8 +46,11 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
         val menu = buildElement {
             menu {
                 menuItem {
-                    userOutlined { }
-                    +"个人信息"
+                    Link {
+                        attrs.to = "/order"
+                        userOutlined { }
+                        +"个人订单"
+                    }
                 }
                 menuItem {
                     Link {
@@ -67,12 +70,13 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                     }
                 }
                 menuItem {
-                    logoutOutlined { }
-                    +"退出登录"
+                    Link {
+                        attrs.to = "/"
+                        logoutOutlined { }
+                        +"退出登录"
+                    }
                     attrs.onClick = {
-                        localStorage.setItem("id", "")
-                        localStorage.setItem("name", "")
-                        localStorage.setItem("authLevel", "")
+                        localStorage.setItem("user", "")
                         setState {
                             user = User(-1, "", "", -1)
                             isAuthored = false
@@ -86,18 +90,13 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
     }
 
     override fun componentDidMount() {
-        val userID = localStorage.getItem("id")
-        val username = localStorage.getItem("name")
-        val authLevel = localStorage.getItem("authLevel")
-        if (userID != null && userID.isNotEmpty() && userID.toInt() != -1 && username != null
-            && authLevel != null && authLevel.isNotEmpty() && authLevel.toInt() != -1
-        )
-            setState(
-                HeaderState(
-                    User(userID.toInt(), username, "", authLevel.toInt()), typedInName = "", typedInPassword = "",
-                    isAuthored = true, isModalVisible = false
-                )
-            )
+        val localUser = getLocalUser()
+        if (localUser != null) {
+            setState {
+                user = localUser
+                isAuthored = true
+            }
+        }
     }
 
     private fun showModal() {
@@ -108,50 +107,41 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
         setState { isModalVisible = false }
     }
 
-
-    private suspend fun login() {
-        val response =
-            window.fetch(
-                "http://localhost:8080/user/login?" +
-                        "username=${state.typedInName}&password=${state.typedInPassword}"
-            )
-                .await()
-                .text()
-                .await()
-        val user = Json.decodeFromString<User>(response)
-        if (user.id != -1) {
-            if (user.auth_level < 0) {
-                message.error("您的账号已经被禁用")
-                setState(
-                    HeaderState(
-                        User(-1, "", "", -1),
-                        typedInName = "",
-                        typedInPassword = "",
-                        isAuthored = false,
-                        isModalVisible = false
+    private fun login() {
+        GlobalScope.launch {
+            val user = checkLogin(state.typedInName, state.typedInPassword)
+            if (user != null) {
+                if (user.auth_level!! < 0) {
+                    message.error("您的账号已经被禁用")
+                    setState(
+                        HeaderState(
+                            User(-1, "", "", -1),
+                            typedInName = "",
+                            typedInPassword = "",
+                            isAuthored = false,
+                            isModalVisible = false
+                        )
                     )
-                )
-                return
+                } else {
+                    message.success("登录成功")
+                    setLocalUser(user)
+                    setState(
+                        HeaderState(
+                            user,
+                            typedInName = "",
+                            typedInPassword = "",
+                            isAuthored = true,
+                            isModalVisible = false
+                        )
+                    )
+                }
+            } else {
+                message.error("登录失败")
             }
-            message.success("登录成功")
-            localStorage.setItem("id", user.id.toString())
-            localStorage.setItem("name", user.username)
-            localStorage.setItem("authLevel", user.auth_level.toString())
-            setState(
-                HeaderState(
-                    user,
-                    typedInName = "",
-                    typedInPassword = "",
-                    isAuthored = true,
-                    isModalVisible = false
-                )
-            )
-        } else {
-            message.error("登录失败")
         }
     }
 
-    private suspend fun register() {
+    private fun register() {
         if (state.typedInName.isEmpty()) {
             message.error("请输入用户名")
             return
@@ -160,31 +150,25 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
             message.error("密码长度不短于6位")
             return
         }
-        val response =
-            window.fetch(
-                "http://localhost:8080/user/register?" +
-                        "username=${state.typedInName}&password=${state.typedInPassword}"
-            )
-                .await()
-                .text()
-                .await()
-        val user = Json.decodeFromString<User>(response)
-        if (user.id != -1) {
-            message.success("注册成功")
-            localStorage.setItem("id", user.id.toString())
-            localStorage.setItem("name", user.username)
-            localStorage.setItem("authLevel", user.auth_level.toString())
-            setState(
-                HeaderState(
-                    user,
-                    typedInName = "",
-                    typedInPassword = "",
-                    isAuthored = true,
-                    isModalVisible = false
+        GlobalScope.launch {
+            val user = checkRegister(state.typedInName, state.typedInPassword)
+            if (user != null) {
+                message.success("注册成功")
+                localStorage.setItem("id", user.id.toString())
+                localStorage.setItem("name", user.username!!)
+                localStorage.setItem("authLevel", user.auth_level.toString())
+                setState(
+                    HeaderState(
+                        user,
+                        typedInName = "",
+                        typedInPassword = "",
+                        isAuthored = true,
+                        isModalVisible = false
+                    )
                 )
-            )
-        } else {
-            message.error("注册失败")
+            } else {
+                message.error("注册失败")
+            }
         }
     }
 
@@ -238,7 +222,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                 div {
                     attrs.style = js { float = "right" }
                     dropdown {
-                        attrs.overlay = buildMenu(state.user.auth_level > 0)
+                        attrs.overlay = buildMenu(state.user.auth_level!! > 0)
                         button {
                             +"Hello, ${state.user.username}"
                             downOutlined { }
@@ -276,9 +260,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                                 attrs.placeholder = "请输入用户名"
                                 attrs.onChange = nameInputChangeHandler
                                 attrs.onPressEnter = {
-                                    GlobalScope.launch {
-                                        login()
-                                    }
+                                    login()
                                 }
                             }
                             password {
@@ -286,27 +268,21 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                                 attrs.placeholder = "请输入密码"
                                 attrs.onChange = passwordInputChangeHandler
                                 attrs.onPressEnter = {
-                                    GlobalScope.launch {
-                                        login()
-                                    }
+                                    login()
                                 }
                             }
                             button {
                                 attrs.block = true
                                 attrs.type = "primary"
                                 attrs.onClick = {
-                                    GlobalScope.launch {
-                                        login()
-                                    }
+                                    login()
                                 }
                                 +"登录"
                             }
                             button {
                                 attrs.block = true
                                 attrs.onClick = {
-                                    GlobalScope.launch {
-                                        register()
-                                    }
+                                    register()
                                 }
                                 +"注册"
                             }

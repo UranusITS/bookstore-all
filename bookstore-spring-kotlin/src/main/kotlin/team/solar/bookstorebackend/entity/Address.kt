@@ -1,13 +1,17 @@
 package team.solar.bookstorebackend.entity
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Table
+import javax.persistence.*
 
-@Table("address")
-data class Address(
-    @Id val id: Int?,
-    val user_id: Int,
-    val name: String,
-    val phone_number: String,
-    val address_detail: String
+@Entity
+@Table(name = "address")
+class Address(
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    @Id val id: Int? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    val user: User? = null,
+    val name: String? = null,
+    val phone_number: String? = null,
+    var address_detail: String? = null
 )

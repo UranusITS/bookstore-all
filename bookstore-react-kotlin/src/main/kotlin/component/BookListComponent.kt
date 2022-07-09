@@ -10,16 +10,9 @@ import antd.menu.MenuClickEventHandler
 import antd.menu.menu
 import antd.menu.menuItem
 import antd.menu.subMenu
-import data.BookListState
-import kotlinx.browser.window
+import data.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.w3c.fetch.Headers
-import org.w3c.fetch.RequestInit
 import react.*
 
 
@@ -33,65 +26,18 @@ class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) 
         state = BookListState(listOf(), listOf(), defaultSales)
     }
 
-    private suspend fun fetchBookList() {
-        val response = window.fetch("http://localhost:8080/book/books")
-            .await()
-            .text()
-            .await()
-        setState { bookList = Json.decodeFromString(response) }
-    }
-
-    private suspend fun fetchBookListByText(text: String) {
-        val response = window.fetch("http://localhost:8080/book/get-books-by-text?text=$text")
-            .await()
-            .text()
-            .await()
-        setState { bookList = Json.decodeFromString(response) }
-    }
-
-    private suspend fun fetchBookListByTypes() {
-        var flag = true
-        val types = mutableListOf<String>()
-        for (type in state.types) {
-            if (type.second) {
-                types.add(type.first)
-                flag = false
-            }
-        }
-        if (flag) {
-            for (type in state.types) {
-                types.add(type.first)
-            }
-        }
-        val headers = Headers()
-        headers.append("Content-Type", "application/json;charset=UTF-8")
-        val response = window.fetch(
-            "http://localhost:8080/book/get-books-by-types",
-            RequestInit(method = "POST", headers = headers, body = Json.encodeToString(types))
-        )
-            .await()
-            .text()
-            .await()
-        setState { bookList = Json.decodeFromString(response) }
-    }
-
-    private suspend fun fetchTypeList() {
-        val response = window.fetch("http://localhost:8080/book/types")
-            .await()
-            .text()
-            .await()
-        val typeStringList = Json.decodeFromString<List<String>>(response)
-        val typeList = mutableListOf<Pair<String, Boolean>>()
-        for (typeString in typeStringList) {
-            typeList.add(Pair(typeString, false))
-        }
-        setState { types = typeList }
-    }
-
     override fun componentDidMount() {
         GlobalScope.launch {
-            fetchBookList()
-            fetchTypeList()
+            val books = fetchBookList()
+            val typeStringList = fetchTypeList()
+            val typeList = mutableListOf<Pair<String, Boolean>>()
+            for (typeString in typeStringList) {
+                typeList.add(Pair(typeString, false))
+            }
+            setState {
+                types = typeList
+                bookList = books
+            }
         }
     }
 
@@ -107,7 +53,21 @@ class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) 
             --typeCount
         }
         GlobalScope.launch {
-            fetchBookListByTypes()
+            var flag = true
+            val types = mutableListOf<String>()
+            for (type in state.types) {
+                if (type.second) {
+                    types.add(type.first)
+                    flag = false
+                }
+            }
+            if (flag) {
+                for (type in state.types) {
+                    types.add(type.first)
+                }
+            }
+            val books = fetchBookListByTypes(types)
+            setState { bookList = books }
         }
         setState { types = newList }
     }
@@ -127,11 +87,13 @@ class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) 
                     onSearch = { value, _ ->
                         if (value == "") {
                             GlobalScope.launch {
-                                fetchBookList()
+                                val books = fetchBookList()
+                                setState { bookList = books }
                             }
                         } else {
                             GlobalScope.launch {
-                                fetchBookListByText(value)
+                                val books = fetchBookListByText(value)
+                                setState { bookList = books }
                             }
                         }
                     }
@@ -171,15 +133,15 @@ class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) 
                                 attrs.span = 6
                                 BookItemComponent {
                                     attrs {
-                                        id = book.id
-                                        isbn = book.isbn
-                                        name = book.name
-                                        type = book.type
-                                        author = book.author
-                                        price = book.price
-                                        description = book.description
-                                        inventory = book.inventory
-                                        imgPath = book.img_path
+                                        id = book.id!!
+                                        isbn = book.isbn!!
+                                        name = book.name!!
+                                        booktype = book.type!!
+                                        author = book.author!!
+                                        price = book.price!!
+                                        description = book.description!!
+                                        inventory = book.inventory!!
+                                        imgPath = book.img_path!!
                                     }
                                 }
                             }

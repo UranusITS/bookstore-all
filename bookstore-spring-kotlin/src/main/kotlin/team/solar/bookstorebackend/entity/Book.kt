@@ -1,17 +1,19 @@
 package team.solar.bookstorebackend.entity
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Table
+import javax.persistence.*
 
-@Table("books")
-data class Book(
-    @Id val id: Int?,
-    val isbn: String,
-    val name: String,
-    val type: String,
-    val author: String,
-    val price: Double,
-    val description: String,
-    val inventory: Int,
-    val img_path: String
+@Entity
+@Table(name = "books")
+class Book(
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    @Id val id: Int? = null,
+    val isbn: String? = null,
+    val name: String? = null,
+    val type: String? = null,
+    val author: String? = null,
+    val price: Double? = null,
+    val description: String? = null,
+    var inventory: Int? = null,
+    val img_path: String? = null
 )
