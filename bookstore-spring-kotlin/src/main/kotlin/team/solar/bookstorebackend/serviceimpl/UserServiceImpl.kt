@@ -22,4 +22,6 @@ class UserServiceImpl(val dao: UserDao) : UserService {
             dao.save(user)
         }
     }
+
+    override fun deleteById(id: Int) = dao.deleteById(id)
 }

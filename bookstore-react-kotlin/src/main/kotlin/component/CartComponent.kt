@@ -205,7 +205,7 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
                                         fontSize = 18.pt
                                     }
                                     val priceTotal = (state.priceTotal * 100).roundToInt().toDouble() / 100
-                                    +"￥${priceTotal}"
+                                    +"￥$priceTotal"
                                 }
                             }
                             styledDiv {

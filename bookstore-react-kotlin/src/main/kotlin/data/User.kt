@@ -36,6 +36,14 @@ external interface UserProps : Props {
     var authLevel: Int
 }
 
+data class UserConsumptionState(var userConsumptionPairList: List<Pair<User, Double>>) : State
+
+external interface ConsumptionProps : Props {
+    var id: Int
+    var username: String
+    var consumption: Double
+}
+
 fun getLocalUser(): User? {
     val userJson = localStorage.getItem("user")
     return if (!userJson.isNullOrEmpty()) Json.decodeFromString(userJson) else null
@@ -51,6 +59,15 @@ suspend fun getAllUsers(): List<User> {
         .text()
         .await()
     return Json.decodeFromString(response)
+}
+
+suspend fun deleteUserById(id: Int) {
+    window.fetch(
+        "$backendUrl/user/delete?id=$id"
+    )
+        .await()
+        .text()
+        .await()
 }
 
 suspend fun checkLogin(username: String, password: String): User? {

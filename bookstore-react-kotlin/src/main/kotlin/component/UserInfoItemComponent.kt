@@ -37,129 +37,118 @@ class UserInfoItemComponent(props: UserProps) : RComponent<UserProps, UserState>
     }
 
     override fun RBuilder.render() {
-        val user = Json.decodeFromString<User>(localStorage.getItem("user")!!)
-        val adminLevel = user.auth_level!!
-        styledDiv {
-            card {
-                attrs.bordered = true
-                attrs.style = js {
-                    margin = "0 auto"
-                    width = 960
-                }
-                styledDiv {
-                    css {
-                        + UserInfoItemStyles.inline
-                        + UserInfoItemStyles.userId
+        val user = getLocalUser()
+        val adminLevel = user!!.auth_level!!
+        if (state.id != -1) {
+            styledDiv {
+                card {
+                    attrs.bordered = true
+                    attrs.style = js {
+                        margin = "0 auto"
+                        width = 960
                     }
-                    +state.id.toString()
-                }
-                styledDiv {
-                    css {
-                        + UserInfoItemStyles.inline
-                        + UserInfoItemStyles.userName
-                    }
-                    +state.username
-                }
-                styledDiv {
-                    css {
-                        + UserInfoItemStyles.inline
-                        + UserInfoItemStyles.authLevel
-                    }
-                    select<String, SelectComponent<String>> {
-                        attrs.style = js {
-                            margin = "0 auto"
-                            width = 240
+                    styledDiv {
+                        css {
+                            +UserInfoItemStyles.inline
+                            +UserInfoItemStyles.userId
                         }
-                        attrs.defaultValue = state.auth_level.toString()
-                        attrs.onChange = handleAuthLevelChange
-                        if (state.auth_level >= adminLevel)
-                            attrs.disabled = true
-                        option {
-                            attrs.value = "2"
-                            + "超级管理员"
-                            if (adminLevel <= 2)
+                        +state.id.toString()
+                    }
+                    styledDiv {
+                        css {
+                            +UserInfoItemStyles.inline
+                            +UserInfoItemStyles.userName
+                        }
+                        +state.username
+                    }
+                    styledDiv {
+                        css {
+                            +UserInfoItemStyles.inline
+                            +UserInfoItemStyles.authLevel
+                        }
+                        select<String, SelectComponent<String>> {
+                            attrs.style = js {
+                                margin = "0 auto"
+                                width = 240
+                            }
+                            attrs.defaultValue = state.auth_level.toString()
+                            attrs.onChange = handleAuthLevelChange
+                            if (state.auth_level >= adminLevel)
                                 attrs.disabled = true
-                        }
-                        option {
-                            attrs.value = "1"
-                            + "管理员"
-                            if (adminLevel <= 1)
-                                attrs.disabled = true
-                        }
-                        option {
-                            attrs.value = "0"
-                            + "用户"
-                            if (adminLevel <= 0)
-                                attrs.disabled = true
-                        }
-                        option {
-                            attrs.value = "-1"
-                            + "封禁"
-                            if (adminLevel <= -1)
-                                attrs.disabled = true
-                        }
-                    }
-                }
-                styledDiv {
-                    css {
-                        + UserInfoItemStyles.inline
-                        + UserInfoItemStyles.editButton
-                    }
-                    button {
-                        attrs.size = "large"
-                        if (state.auth_level >= adminLevel)
-                            attrs.disabled = true
-                        attrs.icon = buildElement {
-                            saveOutlined { }
-                        }
-                        attrs.onClick = {
-                            GlobalScope.launch {
-                                val headers = Headers()
-                                headers.append("Content-Type", "application/json;charset=UTF-8")
-                                val response = window.fetch(
-                                    "$backendUrl/user/update-user-auth",
-                                    RequestInit(
-                                        method = "POST",
-                                        headers = headers,
-                                        body = Json.encodeToString(User(state))
-                                    )
-                                )
-                                    .await()
-                                    .text()
-                                    .await()
-                                message.success("保存成功")
+                            option {
+                                attrs.value = "2"
+                                +"超级管理员"
+                                if (adminLevel <= 2)
+                                    attrs.disabled = true
+                            }
+                            option {
+                                attrs.value = "1"
+                                +"管理员"
+                                if (adminLevel <= 1)
+                                    attrs.disabled = true
+                            }
+                            option {
+                                attrs.value = "0"
+                                +"用户"
+                                if (adminLevel <= 0)
+                                    attrs.disabled = true
+                            }
+                            option {
+                                attrs.value = "-1"
+                                +"封禁"
+                                if (adminLevel <= -1)
+                                    attrs.disabled = true
                             }
                         }
                     }
-                    button {
-                        attrs.size = "large"
-                        attrs.danger = true
-                        attrs.type = "primary"
-                        if (state.auth_level >= adminLevel)
-                            attrs.disabled = true
-                        attrs.icon = buildElement {
-                            deleteOutlined { }
+                    styledDiv {
+                        css {
+                            +UserInfoItemStyles.inline
+                            +UserInfoItemStyles.editButton
                         }
-                        attrs.onClick = {
-                            console.log("删除尝试")
-                            /**
-                            GlobalScope.launch {
-                                val headers = Headers()
-                                headers.append("Content-Type", "application/json;charset=UTF-8")
-                                val response = window.fetch(
-                                    "$backendUrl/user/delete",
-                                    RequestInit(
-                                        method = "POST",
-                                        headers = headers,
-                                        body = Json.encodeToString(User(state))
-                                    )
-                                )
-                                    .await()
-                                    .text()
-                                    .await()
-                                message.success("删除成功")
+                        button {
+                            attrs.size = "large"
+                            if (state.auth_level >= adminLevel)
+                                attrs.disabled = true
+                            attrs.icon = buildElement {
+                                saveOutlined { }
                             }
-                            */
+                            attrs.onClick = {
+                                GlobalScope.launch {
+                                    val headers = Headers()
+                                    headers.append("Content-Type", "application/json;charset=UTF-8")
+                                    val response = window.fetch(
+                                        "$backendUrl/user/update-user-auth",
+                                        RequestInit(
+                                            method = "POST",
+                                            headers = headers,
+                                            body = Json.encodeToString(User(state))
+                                        )
+                                    )
+                                        .await()
+                                        .text()
+                                        .await()
+                                    message.success("保存成功")
+                                }
+                            }
+                        }
+                        button {
+                            attrs.size = "large"
+                            attrs.danger = true
+                            attrs.type = "primary"
+                            if (state.auth_level >= adminLevel)
+                                attrs.disabled = true
+                            attrs.icon = buildElement {
+                                deleteOutlined { }
+                            }
+                            attrs.onClick = {
+                                console.log("删除尝试")
+                                GlobalScope.launch {
+                                    deleteUserById(state.id)
+                                    message.success("删除成功")
+                                    setState(UserState(-1, "", -1))
+                                }
+                            }
                         }
                     }
                 }

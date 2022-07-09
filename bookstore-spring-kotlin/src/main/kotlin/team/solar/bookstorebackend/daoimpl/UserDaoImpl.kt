@@ -17,4 +17,6 @@ class UserDaoImpl(val repo: UserRepository) : UserDao {
     override fun countUsersByUsername(username: String?) = repo.countUsersByUsername(username)
 
     override fun save(user: User) = repo.save(user)
+
+    override fun deleteById(id: Int) = repo.deleteById(id)
 }

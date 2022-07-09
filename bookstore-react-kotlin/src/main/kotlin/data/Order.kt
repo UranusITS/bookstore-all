@@ -27,6 +27,14 @@ data class OrderState(
     var isModalVisible: Boolean
 ): State
 
+data class OrderAdminState(
+    var id: Int,
+    var user: User?,
+    var address: Address?,
+    var orderItems: List<OrderItem>,
+    var isModalVisible: Boolean
+): State
+
 external interface OrderProps : Props {
     var id: Int
 }
@@ -55,12 +63,18 @@ suspend fun addOrder(order: Order): Int {
         .toInt()
 }
 
+suspend fun getAllOrders(): List<Order> {
+    val response = window.fetch("$backendUrl/order/all-orders")
+        .await()
+        .text()
+        .await()
+    return Json.decodeFromString(response)
+}
+
 suspend fun getOrdersByUser(user: User): List<Order> {
-    console.log(user)
     val response = window.fetch("$backendUrl/order/orders?user-id=${user.id}")
         .await()
         .text()
         .await()
-    console.log(response)
     return Json.decodeFromString(response)
 }

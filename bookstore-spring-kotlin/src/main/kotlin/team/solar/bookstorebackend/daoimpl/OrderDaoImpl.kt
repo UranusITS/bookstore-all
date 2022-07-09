@@ -10,7 +10,9 @@ import team.solar.bookstorebackend.repository.OrderRepository
 class OrderDaoImpl(val repo: OrderRepository) : OrderDao {
     override fun getOrderById(id: Int): Order = repo.getOrderById(id)
 
-    override fun getOrdersByUser(user: User): List<Order> = repo.getOrdersByUser(user)
+    override fun getOrdersByUser(user: User) = repo.getOrdersByUser(user)
+
+    override fun getAllOrders(): List<Order> = repo.findAll().toList()
 
     override fun save(order: Order): Order = repo.save(order)
 }

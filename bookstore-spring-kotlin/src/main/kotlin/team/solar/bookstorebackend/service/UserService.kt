@@ -12,4 +12,6 @@ interface UserService {
     fun addUser(user: User): User
 
     fun updateUserAuth(user: User)
+
+    fun deleteById(id: Int)
 }

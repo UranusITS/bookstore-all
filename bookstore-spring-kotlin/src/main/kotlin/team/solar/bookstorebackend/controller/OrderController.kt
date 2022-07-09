@@ -17,6 +17,9 @@ class OrderController(val service: OrderService) {
     @RequestMapping("/orders")
     fun getOrdersByUserId(@RequestParam("user-id") user_id: Int) = service.getOrdersByUserID(user_id)
 
+    @RequestMapping("/all-orders")
+    fun getAllOrders() = service.getAllOrders()
+
     @RequestMapping("/add-order")
     fun addItem(@RequestBody order: Order) = service.addOrder(order)
 }

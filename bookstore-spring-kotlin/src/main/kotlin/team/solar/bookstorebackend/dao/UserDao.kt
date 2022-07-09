@@ -12,4 +12,6 @@ interface UserDao {
     fun countUsersByUsername(username: String?): Int
 
     fun save(user: User): User
+
+    fun deleteById(id: Int)
 }

@@ -8,5 +8,7 @@ interface OrderDao {
 
     fun getOrdersByUser(user: User): List<Order>
 
+    fun getAllOrders(): List<Order>
+
     fun save(order: Order): Order
 }

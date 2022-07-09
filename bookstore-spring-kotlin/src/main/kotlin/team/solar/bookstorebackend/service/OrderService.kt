@@ -7,5 +7,7 @@ interface OrderService {
 
     fun getOrdersByUserID(user_id: Int): List<Order>
 
+    fun getAllOrders(): List<Order>
+
     fun addOrder(order: Order): Int?
 }

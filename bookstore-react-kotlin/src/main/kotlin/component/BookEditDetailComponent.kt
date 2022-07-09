@@ -33,13 +33,13 @@ import styled.styledSpan
 
 class BookEditDetailComponent(props: Props) : RComponent<Props, BookState>(props) {
     init {
-        state = BookState()
+        state = BookState(null, "", "", "", "", "", "", "", "")
     }
 
     override fun componentDidMount() {
         GlobalScope.launch {
             val bookId = localStorage.getItem("editBookId")
-            if (bookId != null) {
+            if (bookId != null && bookId != "") {
                 val book = getBookById(bookId.toInt())
                 if (book != null) {
                     setState(BookState(book))
@@ -229,7 +229,13 @@ class BookEditDetailComponent(props: Props) : RComponent<Props, BookState>(props
                                     size = "large"
                                     onClick = {
                                         GlobalScope.launch {
-                                            updateBook(Book(state))
+                                            if (state.id != null) {
+                                                updateBook(Book(state))
+                                            }
+                                            else {
+                                                val book = addBook(Book(state))
+                                                setState(BookState(book))
+                                            }
                                             message.success("保存成功")
                                         }
                                     }
@@ -250,7 +256,12 @@ class BookEditDetailComponent(props: Props) : RComponent<Props, BookState>(props
                                 }
                                 attrs.size = "large"
                                 Link {
-                                    attrs.to = "/book/${state.id}"
+                                    if(state.id != null) {
+                                        attrs.to = "/book/${state.id}"
+                                    }
+                                    else {
+                                        attrs.to = "/"
+                                    }
                                     closeCircleOutlined { }
                                     +"退出修改"
                                 }

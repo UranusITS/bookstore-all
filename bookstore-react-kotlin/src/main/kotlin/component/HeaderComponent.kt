@@ -68,6 +68,14 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                             +"后台管理"
                         }
                     }
+                    menuItem {
+                        attrs.disabled = false
+                        Link {
+                            attrs.to = "/book-edit"
+                            plusCircleOutlined { }
+                            +"新增图书"
+                        }
+                    }
                 }
                 menuItem {
                     Link {

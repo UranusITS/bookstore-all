@@ -12,14 +12,14 @@ import react.*
 
 class AdminPanelComponent(props: Props) : RComponent<Props, AdminPanelState>(props) {
     init {
-        state = AdminPanelState("user")
+        state = AdminPanelState("auth")
     }
 
     private var typeCount = 0
 
     private val handleClick: MenuClickEventHandler = { info ->
         console.log(info)
-        //setState { curMenuItemIndex = info.key }
+        setState { curMenuItemKey = info.key as String }
     }
 
     override fun RBuilder.render() {
@@ -38,23 +38,29 @@ class AdminPanelComponent(props: Props) : RComponent<Props, AdminPanelState>(pro
                             mode = "inline"
                             defaultOpenKeys = arrayOf("type")
                             onClick = handleClick
-                            defaultSelectedKeys = arrayOf("user")
+                            defaultSelectedKeys = arrayOf("auth")
                         }
                         menuItem {
-                            attrs.key = "user"
-                            + "用户管理"
+                            attrs.key = "auth"
+                            + "用户权限"
                         }
                         menuItem {
-                            attrs.key = "statistic"
+                            attrs.key = "order"
                             + "订单统计"
+                        }
+                        menuItem {
+                            attrs.key = "consumption"
+                            + "消费统计"
                         }
                     }
                 }
                 content {
-                    if (state.curMenuItemKey == "user")
+                    if (state.curMenuItemKey == "auth")
                         child(UserInfoComponent::class) { }
-                    else if(state.curMenuItemKey == "statistic")
-                        + "233"
+                    else if(state.curMenuItemKey == "order")
+                        child(OrderListAdminComponent::class) { }
+                    else if(state.curMenuItemKey == "consumption")
+                        child(UserConsumptionComponent::class) { }
                 }
             }
         }

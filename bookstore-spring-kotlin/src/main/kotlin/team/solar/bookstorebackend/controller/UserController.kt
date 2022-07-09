@@ -29,5 +29,8 @@ class UserController(val service: UserService) {
     }
 
     @RequestMapping("/update-user-auth")
-    fun updateBook(@RequestBody user: User) = service.updateUserAuth(user)
+    fun updateUserAuth(@RequestBody user: User) = service.updateUserAuth(user)
+
+    @RequestMapping("/delete")
+    fun deleteById(@RequestParam("id") id: Int) = service.deleteById(id)
 }

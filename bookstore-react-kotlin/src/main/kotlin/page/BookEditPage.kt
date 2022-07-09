@@ -33,12 +33,16 @@ val bookEditPage = fc<BookProps> { props ->
                 styledDiv {
                     css { +BookDetailStyles.frame }
                     if (bookId == null) {
+                        localStorage.setItem("editBookId", "")
+                        child(BookEditDetailComponent::class) { }
+                        /**
                         errorComponent {
                             attrs {
                                 errorCode = 404
                                 extraInfo = "请给出bookId"
                             }
                         }
+                        */
                     } else {
                         var book: Book? by useState(null)
                         GlobalScope.launch {

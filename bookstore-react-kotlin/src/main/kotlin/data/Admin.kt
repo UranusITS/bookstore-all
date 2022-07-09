@@ -2,4 +2,4 @@ package data
 
 import react.State
 
-data class AdminPanelState(val curMenuItemKey: String) : State
+data class AdminPanelState(var curMenuItemKey: String) : State

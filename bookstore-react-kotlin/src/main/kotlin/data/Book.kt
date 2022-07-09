@@ -93,6 +93,23 @@ suspend fun updateBook(book: Book) {
         .await()
 }
 
+suspend fun addBook(book: Book): Book {
+    val headers = Headers()
+    headers.append("Content-Type", "application/json;charset=UTF-8")
+    val response = window.fetch(
+        "$backendUrl/book/add-book",
+        RequestInit(
+            method = "POST",
+            headers = headers,
+            body = Json.encodeToString(book)
+        )
+    )
+        .await()
+        .text()
+        .await()
+    return Json.decodeFromString(response)
+}
+
 suspend fun deleteBookById(id: Int) {
     window.fetch("$backendUrl/book/delete-book?id=$id")
         .await()
