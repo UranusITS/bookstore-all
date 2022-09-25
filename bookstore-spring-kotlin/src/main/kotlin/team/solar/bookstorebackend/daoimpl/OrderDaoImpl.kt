@@ -5,6 +5,7 @@ import team.solar.bookstorebackend.dao.OrderDao
 import team.solar.bookstorebackend.entity.Order
 import team.solar.bookstorebackend.entity.User
 import team.solar.bookstorebackend.repository.OrderRepository
+import javax.transaction.Transactional
 
 @Repository
 class OrderDaoImpl(val repo: OrderRepository) : OrderDao {
@@ -14,5 +15,6 @@ class OrderDaoImpl(val repo: OrderRepository) : OrderDao {
 
     override fun getAllOrders(): List<Order> = repo.findAll().toList()
 
+    @Transactional(Transactional.TxType.REQUIRED)
     override fun save(order: Order): Order = repo.save(order)
 }

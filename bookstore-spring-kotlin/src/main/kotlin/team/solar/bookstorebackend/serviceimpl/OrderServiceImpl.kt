@@ -17,7 +17,7 @@ class OrderServiceImpl(val dao: OrderDao, val itemsDao: OrderItemDao, val bookDa
 
     override fun getAllOrders() = dao.getAllOrders()
 
-    @Transactional
+    @Transactional(Transactional.TxType.REQUIRED)
     override fun addOrder(order: Order): Int? {
         val savedOrder = dao.save(order)
         val orderItems = order.orderItems

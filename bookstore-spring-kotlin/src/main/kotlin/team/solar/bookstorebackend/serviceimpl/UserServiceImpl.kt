@@ -1,6 +1,8 @@
 package team.solar.bookstorebackend.serviceimpl
 
+import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Service
+import org.springframework.web.context.WebApplicationContext
 import team.solar.bookstorebackend.dao.UserDao
 import team.solar.bookstorebackend.entity.Book
 import team.solar.bookstorebackend.entity.User

@@ -7,6 +7,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.w3c.fetch.INCLUDE
+import org.w3c.fetch.RequestCredentials
+import org.w3c.fetch.RequestInit
+import org.w3c.fetch.SAME_ORIGIN
 import react.Props
 import react.State
 import react.setState
@@ -54,7 +58,10 @@ fun setLocalUser(user: User?) {
 }
 
 suspend fun getAllUsers(): List<User> {
-    val response = window.fetch("$backendUrl/user/users")
+    val response = window.fetch(
+        "$backendUrl/user/users",
+        RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
+    )
         .await()
         .text()
         .await()
@@ -63,7 +70,8 @@ suspend fun getAllUsers(): List<User> {
 
 suspend fun deleteUserById(id: Int) {
     window.fetch(
-        "$backendUrl/user/delete?id=$id"
+        "$backendUrl/user/delete?id=$id",
+        RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
     )
         .await()
         .text()
@@ -73,7 +81,8 @@ suspend fun deleteUserById(id: Int) {
 suspend fun checkLogin(username: String, password: String): User? {
     val response =
         window.fetch(
-            "$backendUrl/user/login?username=${username}&password=${password}"
+            "$backendUrl/user/login?username=${username}&password=${password}",
+            RequestInit(credentials = RequestCredentials.INCLUDE)
         )
             .await()
             .text()
@@ -91,7 +100,8 @@ suspend fun checkRegister(username: String, password: String): User? {
     }
     val response =
         window.fetch(
-            "$backendUrl/user/register?username=${username}&password=${password}"
+            "$backendUrl/user/register?username=${username}&password=${password}",
+            RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
         )
             .await()
             .text()

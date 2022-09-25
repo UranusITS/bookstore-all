@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository
 import team.solar.bookstorebackend.dao.BookDao
 import team.solar.bookstorebackend.entity.Book
 import team.solar.bookstorebackend.repository.BookRepository
+import javax.transaction.Transactional
 
 @Repository
 class BookDaoImpl(val repo: BookRepository) : BookDao {
@@ -22,6 +23,7 @@ class BookDaoImpl(val repo: BookRepository) : BookDao {
 
     override fun getBookById(id: Int?) = repo.getBookById(id)
 
+    @Transactional(Transactional.TxType.REQUIRED)
     override fun save(book: Book) = repo.save(book)
 
     override fun deleteById(id: Int) = repo.deleteById(id)

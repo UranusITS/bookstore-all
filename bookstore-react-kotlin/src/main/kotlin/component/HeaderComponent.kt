@@ -23,7 +23,12 @@ import kotlinx.coroutines.launch
 import kotlinx.html.style
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import moment.Duration
 import org.w3c.dom.HTMLInputElement
+import org.w3c.fetch.INCLUDE
+import org.w3c.fetch.RequestCredentials
+import org.w3c.fetch.RequestInit
+import org.w3c.fetch.SAME_ORIGIN
 import react.*
 import react.dom.a
 import react.dom.div
@@ -84,6 +89,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                         +"退出登录"
                     }
                     attrs.onClick = {
+                        logout()
                         localStorage.setItem("user", "")
                         setState {
                             user = User(-1, "", "", -1)
@@ -145,6 +151,33 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                 }
             } else {
                 message.error("登录失败")
+            }
+        }
+    }
+
+    private fun logout() {
+        GlobalScope.launch {
+            val username = state.user.username
+            val response =
+                window.fetch(
+                    "$backendUrl/user/logout?username=${username}",
+                    RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
+                )
+                    .await()
+                    .text()
+                    .await()
+            var seconds = response.toInt()
+            val hours = seconds / 3600
+            val minutes = seconds / 60 % 60
+            seconds %= 60
+            if (hours > 0) {
+                message.success("退出登录成功，总登录时长${hours}时${minutes}分${seconds}秒")
+            }
+            else if (minutes > 0) {
+                message.success("退出登录成功，总登录时长${minutes}分${seconds}秒")
+            }
+            else {
+                message.success("退出登录成功，总登录时长${seconds}秒")
             }
         }
     }
