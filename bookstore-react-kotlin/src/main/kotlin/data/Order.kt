@@ -50,17 +50,16 @@ suspend fun getOrderById(id: Int): Order? {
     return Json.decodeFromString(response)
 }
 
-suspend fun addOrder(order: Order): Int {
+suspend fun addOrder(order: Order) {
     val headers = Headers()
     headers.append("Content-Type", "application/json;charset=UTF-8")
-    return window.fetch(
+    window.fetch(
         "$backendUrl/order/add-order",
         RequestInit(method = "POST", headers = headers, body = Json.encodeToString(order))
     )
         .await()
         .text()
         .await()
-        .toInt()
 }
 
 suspend fun getAllOrders(): List<Order> {

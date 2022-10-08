@@ -29,6 +29,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.WebSocket
 import org.w3c.fetch.Headers
 import org.w3c.fetch.RequestInit
 import react.Props
@@ -109,8 +110,22 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
             orderItemList.add(OrderItem(null, null, book.name, book.author, book.price, item.num, book.img_path))
         }
         val order = Order(user = user, address = Address(id = state.selectedAddressID), orderItems = orderItemList)
+        val socket = WebSocket("$websocketUrl/websocket/${user.username}")
+        socket.onmessage = {
+            print(it.data)
+            when (it.data) {
+                "SUCCESS" -> {
+                    message.success("下单成功")
+                }
+                "FAILED" -> {
+                    message.error("下单失败")
+                }
+                else -> {
+                    message.error("下单失败")
+                }
+            }
+        }
         addOrder(order)
-        message.success("下单成功")
         clearCartItems(user)
         fetchCartItems()
     }
