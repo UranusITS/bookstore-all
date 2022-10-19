@@ -17,21 +17,12 @@ import antd.select.select
 import antd.space.space
 import data.*
 import kotlinext.js.js
-import kotlinx.browser.localStorage
-import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.html.style
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.WebSocket
-import org.w3c.fetch.Headers
-import org.w3c.fetch.RequestInit
 import react.Props
 import react.RBuilder
 import react.RComponent
@@ -46,8 +37,40 @@ import kotlin.math.roundToInt
 
 
 class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
+    private var socket: WebSocket? = null
+
     init {
         state = CartState(listOf(), .0, listOf(), false, Address(), -1)
+        val user = getLocalUser()
+        if (user != null) {
+            socket = WebSocket("$websocketUrl/websocket/${user.username}")
+            socket!!.onopen = {
+                console.log("websocket 连接成功")
+                socket!!.send("hello from ${user.id}")
+            }
+            socket!!.onclose = {
+                console.log("websocket 连接关闭")
+            }
+            socket!!.onmessage = {
+                console.log(it)
+                console.log(it.data)
+                when (it.data) {
+                    "SUCCESS" -> {
+                        message.success("下单成功")
+                        GlobalScope.launch {
+                            clearCartItems(user)
+                            fetchCartItems()
+                        }
+                    }
+                    "FAILED" -> {
+                        message.error("下单失败")
+                    }
+                    else -> {
+                        message.error("下单失败")
+                    }
+                }
+            }
+        }
     }
 
     override fun componentDidMount() {
@@ -110,24 +133,7 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
             orderItemList.add(OrderItem(null, null, book.name, book.author, book.price, item.num, book.img_path))
         }
         val order = Order(user = user, address = Address(id = state.selectedAddressID), orderItems = orderItemList)
-        val socket = WebSocket("$websocketUrl/websocket/${user.username}")
-        socket.onmessage = {
-            print(it.data)
-            when (it.data) {
-                "SUCCESS" -> {
-                    message.success("下单成功")
-                }
-                "FAILED" -> {
-                    message.error("下单失败")
-                }
-                else -> {
-                    message.error("下单失败")
-                }
-            }
-        }
         addOrder(order)
-        clearCartItems(user)
-        fetchCartItems()
     }
 
     private suspend fun fetchCartItems() {

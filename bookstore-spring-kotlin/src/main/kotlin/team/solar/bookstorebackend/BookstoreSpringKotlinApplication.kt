@@ -2,7 +2,9 @@ package team.solar.bookstorebackend
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.socket.server.standard.ServerEndpointExporter
 import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
@@ -28,5 +30,13 @@ class CorsFilter : Filter {
         response.setHeader("Access-Control-Max-Age", "3600")
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
         chain!!.doFilter(req, res)
+    }
+}
+
+@Configuration
+class WebsocketConfig {
+    @Bean
+    fun serverEndpointExporter(): ServerEndpointExporter {
+        return ServerEndpointExporter()
     }
 }

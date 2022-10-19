@@ -1,4 +1,5 @@
 package data
 
-const val backendUrl = "http://localhost:8080"
-const val websocketUrl = "ws://localhost:8080"
+const val ipAddress = "localhost:8080"
+const val backendUrl = "http://$ipAddress"
+const val websocketUrl = "ws://$ipAddress"
