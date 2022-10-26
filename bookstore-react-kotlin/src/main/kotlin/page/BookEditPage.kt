@@ -8,12 +8,9 @@ import data.BookProps
 import data.getBookById
 import kotlinext.js.js
 import kotlinx.browser.localStorage
-import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
+import kotlinx.js.get
 import react.dom.div
 import react.fc
 import react.router.useParams

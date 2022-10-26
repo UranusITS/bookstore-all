@@ -5,13 +5,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.context.annotation.SessionScope
 import team.solar.bookstorebackend.entity.User
 import team.solar.bookstorebackend.service.TimerService
 import team.solar.bookstorebackend.service.UserService
 
 @RestController
 @RequestMapping("/user")
-@Scope("singleton")
+//@Scope("singleton")
+@SessionScope
 class UserController(val service: UserService,val timerService: TimerService) {
     @RequestMapping("/users")
     fun findAll(): List<User> = service.findAll()
