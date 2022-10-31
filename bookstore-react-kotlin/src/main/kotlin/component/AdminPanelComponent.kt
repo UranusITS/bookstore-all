@@ -15,8 +15,6 @@ class AdminPanelComponent(props: Props) : RComponent<Props, AdminPanelState>(pro
         state = AdminPanelState("auth")
     }
 
-    private var typeCount = 0
-
     private val handleClick: MenuClickEventHandler = { info ->
         console.log(info)
         setState { curMenuItemKey = info.key as String }
@@ -55,12 +53,11 @@ class AdminPanelComponent(props: Props) : RComponent<Props, AdminPanelState>(pro
                     }
                 }
                 content {
-                    if (state.curMenuItemKey == "auth")
-                        child(UserInfoComponent::class) { }
-                    else if(state.curMenuItemKey == "order")
-                        child(OrderListAdminComponent::class) { }
-                    else if(state.curMenuItemKey == "consumption")
-                        child(UserConsumptionComponent::class) { }
+                    when (state.curMenuItemKey) {
+                        "auth" -> child(UserInfoComponent::class) { }
+                        "order" -> child(OrderListAdminComponent::class) { }
+                        "consumption" -> child(UserConsumptionComponent::class) { }
+                    }
                 }
             }
         }

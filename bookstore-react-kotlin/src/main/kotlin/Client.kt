@@ -1,17 +1,16 @@
 import kotlinext.js.require
 import kotlinx.browser.document
-import kotlinx.browser.localStorage
 import kotlinx.browser.window
-import react.dom.render
+import react.Fragment
+import react.create
+import react.dom.client.createRoot
 
 fun main() {
     require("antd/dist/antd.css")
-    //localStorage.clear()
     window.onload = {
-        document.getElementById("root")?.let { it1 ->
-            render(it1) {
-                basicRoute()
-            }
-        }
+        val container = document.getElementById("root") ?: error("Couldn't find root container!")
+        createRoot(container).render(Fragment.create {
+            basicRoute()
+        })
     }
 }

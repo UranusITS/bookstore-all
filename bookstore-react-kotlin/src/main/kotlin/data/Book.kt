@@ -10,7 +10,6 @@ import org.w3c.fetch.Headers
 import org.w3c.fetch.RequestInit
 import react.Props
 import react.State
-import kotlin.js.Promise
 
 
 @Serializable

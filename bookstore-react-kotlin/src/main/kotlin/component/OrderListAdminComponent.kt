@@ -6,7 +6,6 @@ import antd.layout.content
 import data.OrderListState
 import data.getAllOrders
 import data.getLocalUser
-import data.getOrdersByUser
 import kotlinext.js.js
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

@@ -1,6 +1,5 @@
 package data
 
-import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlinx.serialization.Serializable
@@ -9,7 +8,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.fetch.Headers
 import org.w3c.fetch.RequestInit
-import react.setState
 
 
 @Serializable
@@ -20,8 +18,6 @@ data class Address(
     var phone_number: String? = null,
     var address_detail: String? = null
 ) {
-    constructor(user_id: Int) : this(null, User(id=user_id), "", "", "")
-
     fun toAddressItem(): String {
         return "$name $phone_number $address_detail"
     }
@@ -32,7 +28,7 @@ suspend fun getAddress(user: User): List<Address> {
         .await()
         .text()
         .await()
-    return Json.decodeFromString<List<Address>>(response)
+    return Json.decodeFromString(response)
 }
 
 suspend fun addAddress(address: Address) {

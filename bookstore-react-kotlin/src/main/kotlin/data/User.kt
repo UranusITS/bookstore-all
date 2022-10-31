@@ -10,10 +10,8 @@ import kotlinx.serialization.json.Json
 import org.w3c.fetch.INCLUDE
 import org.w3c.fetch.RequestCredentials
 import org.w3c.fetch.RequestInit
-import org.w3c.fetch.SAME_ORIGIN
 import react.Props
 import react.State
-import react.setState
 
 
 @Serializable
@@ -23,8 +21,6 @@ data class User(
     val password: String? = null,
     val auth_level: Int? = null
 ) {
-    constructor(props: UserProps) : this(props.id, props.username, "", props.authLevel)
-
     constructor(state: UserState) : this(state.id, state.username, "", state.auth_level)
 }
 

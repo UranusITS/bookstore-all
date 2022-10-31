@@ -21,14 +21,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import kotlinx.html.style
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import moment.Duration
 import org.w3c.dom.HTMLInputElement
 import org.w3c.fetch.INCLUDE
 import org.w3c.fetch.RequestCredentials
 import org.w3c.fetch.RequestInit
-import org.w3c.fetch.SAME_ORIGIN
 import react.*
 import react.dom.a
 import react.dom.div
@@ -246,16 +242,16 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                 width = "100%"
             }
             div {
-                attrs.style = js { float = "left" }
+                attrs.style = js { float = "left" } as String
                 a {
                     attrs.href = ""
                     img {
                         attrs.src = "assets/logo.svg"
-                        attrs.style = js { height = 48 }
+                        attrs.style = js { height = 48 } as String
                     }
                     img {
                         attrs.src = "assets/logo-name.svg"
-                        attrs.style = js { height = 48 }
+                        attrs.style = js { height = 48 } as String
                     }
                 }
             }

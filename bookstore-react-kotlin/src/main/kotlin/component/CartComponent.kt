@@ -298,7 +298,7 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
                     attrs.style = js {
                         width = 240
                         margin = "auto"
-                    }
+                    } as String
                     space {
                         attrs.direction = "vertical"
                         attrs.size = 20

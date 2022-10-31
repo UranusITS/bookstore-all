@@ -3,14 +3,9 @@ package component
 import antd.grid.col
 import antd.grid.row
 import data.UserInfoState
-import data.backendUrl
 import data.getAllUsers
-import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import react.*
 
 
