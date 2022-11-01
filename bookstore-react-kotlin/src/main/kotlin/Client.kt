@@ -9,8 +9,7 @@ fun main() {
     require("antd/dist/antd.css")
     window.onload = {
         val container = document.getElementById("root") ?: error("Couldn't find root container!")
-        createRoot(container).render(Fragment.create {
-            basicRoute()
-        })
+        val root = createRoot(container)
+        root.render(basicRoute.create())
     }
 }

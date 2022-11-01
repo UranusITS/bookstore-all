@@ -5,20 +5,20 @@ import org.apache.catalina.connector.Connector
 import org.apache.tomcat.util.descriptor.web.SecurityCollection
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.socket.server.standard.ServerEndpointExporter
-import javax.servlet.Filter
-import javax.servlet.FilterChain
-import javax.servlet.ServletRequest
-import javax.servlet.ServletResponse
-import javax.servlet.annotation.WebFilter
-import javax.servlet.http.HttpServletResponse
+import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
+import java.time.Duration
 
 
 @SpringBootApplication
+@EnableCaching
 class BookstoreSpringKotlinApplication {
     @Bean
     fun connector(): Connector {
@@ -45,30 +45,33 @@ class BookstoreSpringKotlinApplication {
         tomcat.addAdditionalTomcatConnectors(connector)
         return tomcat
     }
+
+    @Bean
+    fun cacheConfiguration(): RedisCacheConfiguration? {
+        return RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(60))
+            .disableCachingNullValues()
+            .serializeValuesWith(SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer()))
+    }
+
+    @Bean
+    fun redisCacheManagerBuilderCustomizer(): RedisCacheManagerBuilderCustomizer? {
+        return RedisCacheManagerBuilderCustomizer { builder: RedisCacheManagerBuilder ->
+            builder
+                .withCacheConfiguration(
+                    "itemCache",
+                    RedisCacheConfiguration.defaultCacheConfig()
+                        .entryTtl(Duration.ofMinutes(10))
+                )
+                .withCacheConfiguration(
+                    "customerCache",
+                    RedisCacheConfiguration.defaultCacheConfig()
+                        .entryTtl(Duration.ofMinutes(5))
+                )
+        }
+    }
 }
 
 fun main(args: Array<String>) {
     runApplication<BookstoreSpringKotlinApplication>(*args)
-}
-
-@WebFilter(filterName = "CorsFilter")
-@Configuration
-class CorsFilter : Filter {
-    override fun doFilter(req: ServletRequest?, res: ServletResponse?, chain: FilterChain?) {
-        val response = res as HttpServletResponse
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:8081")
-        response.setHeader("Access-Control-Allow-Credentials", "true")
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET")
-        response.setHeader("Access-Control-Max-Age", "3600")
-        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-        chain!!.doFilter(req, res)
-    }
-}
-
-@Configuration
-class WebsocketConfig {
-    @Bean
-    fun serverEndpointExporter(): ServerEndpointExporter {
-        return ServerEndpointExporter()
-    }
 }

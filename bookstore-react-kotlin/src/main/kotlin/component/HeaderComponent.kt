@@ -234,27 +234,35 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
     }
 
     override fun RBuilder.render() {
+        console.log("rendering...")
+        console.log("render here 1")
         header {
+            console.log("render here 2")
             attrs.style = js {
                 background = "white"
                 position = "fixed"
                 zIndex = 1
                 width = "100%"
             }
+            console.log("render here 3")
             div {
-                attrs.style = js { float = "left" } as String
+                attrs.style = js { float = "left" }
+                console.log("render here 4")
                 a {
                     attrs.href = ""
+                    console.log("render here 5")
                     img {
                         attrs.src = "assets/logo.svg"
-                        attrs.style = js { height = 48 } as String
+                        attrs.style = js { height = 48 }
                     }
+                    console.log("render here 6")
                     img {
                         attrs.src = "assets/logo-name.svg"
-                        attrs.style = js { height = 48 } as String
+                        attrs.style = js { height = 48 }
                     }
                 }
             }
+            console.log("render here 7")
             if (state.isAuthored) {
                 div {
                     attrs.style = js { float = "right" }
