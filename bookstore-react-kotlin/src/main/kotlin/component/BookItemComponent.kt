@@ -13,6 +13,7 @@ import style.BookItemStyles
 import styled.css
 import styled.styledDiv
 import styled.styledP
+import kotlin.math.roundToInt
 
 
 val BookItemComponent = fc<BookProps> { props ->
@@ -46,7 +47,7 @@ val BookItemComponent = fc<BookProps> { props ->
                 }
                 styledP {
                     css { +BookItemStyles.price }
-                    +"￥${props.price}"
+                    +"￥${(props.price * 100).roundToInt().toDouble() / 100}"
                 }
                 styledP {
                     css { +BookItemStyles.inventory }

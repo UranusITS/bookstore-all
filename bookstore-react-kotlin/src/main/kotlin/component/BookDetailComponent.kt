@@ -19,6 +19,7 @@ import styled.css
 import styled.styledDiv
 import styled.styledImg
 import styled.styledSpan
+import kotlin.math.roundToInt
 
 
 val BookDetailComponent = fc<BookProps> { props ->
@@ -86,7 +87,7 @@ val BookDetailComponent = fc<BookProps> { props ->
                                 color = Color.red
                                 verticalAlign = VerticalAlign.bottom
                             }
-                            +"￥${props.price}"
+                            +"￥${(props.price * 100).roundToInt().toDouble() / 100}"
                         }
                     }
                     descriptionsItem {

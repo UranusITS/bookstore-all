@@ -1,0 +1,44 @@
+{
+  "mappings": {
+    "properties": {
+      "_class": {
+        "type": "keyword",
+        "index": false,
+        "doc_values": false
+      },
+      "author": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "id": {
+        "type": "long"
+      },
+      "img_path": {
+        "type": "keyword"
+      },
+      "inventory": {
+        "type": "long"
+      },
+      "isbn": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "price": {
+        "type": "float"
+      },
+      "type": {
+        "type": "keyword"
+      }
+    }
+  }
+}

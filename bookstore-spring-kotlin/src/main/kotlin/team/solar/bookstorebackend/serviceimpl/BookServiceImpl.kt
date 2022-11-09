@@ -23,9 +23,9 @@ class BookServiceImpl(val dao: BookDao) : BookService {
 
     override fun getBooksByText(text: String): List<Book> {
         val books = mutableListOf<Book>()
-        books.addAll(dao.getBooksByName(text))
-        books.addAll(dao.getBooksByAuthor(text))
-        books.addAll(dao.getBooksByDescription(text))
+        books.addAll(dao.getBooksByNameContaining(text))
+        books.addAll(dao.getBooksByAuthorContaining(text))
+        books.addAll(dao.getBooksByDescriptionContaining(text))
         return books.toSet().toList()
     }
 

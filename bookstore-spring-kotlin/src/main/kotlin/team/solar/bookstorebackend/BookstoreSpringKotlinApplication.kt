@@ -10,6 +10,9 @@ import org.springframework.boot.runApplication
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
@@ -19,6 +22,8 @@ import java.time.Duration
 
 @SpringBootApplication
 @EnableCaching
+@EnableJpaRepositories("team.solar.bookstorebackend.repository")
+@EnableElasticsearchRepositories("team.solar.bookstorebackend.esrepository")
 class BookstoreSpringKotlinApplication {
     @Bean
     fun connector(): Connector {
