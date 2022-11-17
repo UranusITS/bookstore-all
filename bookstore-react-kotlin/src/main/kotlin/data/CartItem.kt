@@ -66,6 +66,24 @@ suspend fun getCartItems(user: User): List<CartItem> {
     return Json.decodeFromString(response)
 }
 
+suspend fun getCartPrice(cartItems: List<CartItem>): Double {
+    val body = mutableListOf<Pair<Int, Double>>()
+    for (cartItem in cartItems) {
+        body.add(Pair(cartItem.num!!, cartItem.book!!.price!!))
+    }
+    val response = window.fetch(
+        "$functionUrl/sum",
+        RequestInit(
+            method = "POST",
+            body = Json.encodeToString(body)
+        )
+    )
+        .await()
+        .text()
+        .await()
+    return response.toDouble()
+}
+
 suspend fun clearCartItems(user: User) {
     window.fetch("$backendUrl/cart-item/delete-item?user-id=${user.id}")
         .await()

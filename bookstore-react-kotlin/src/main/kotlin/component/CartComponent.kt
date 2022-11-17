@@ -140,6 +140,8 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
         val user = getLocalUser()
         if (user != null) {
             val cartItems = getCartItems(user)
+            var newPriceTotal = getCartPrice(cartItems)
+            /**
             var newPriceTotal = .0
             for (cartItem in cartItems) {
                 if (cartItem.checked == true) {
@@ -147,6 +149,7 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
                     newPriceTotal += book?.price?.let { cartItem.num?.times(it) } ?: 0.0
                 }
             }
+            **/
             setState {
                 cartItemList = cartItems
                 priceTotal = newPriceTotal
