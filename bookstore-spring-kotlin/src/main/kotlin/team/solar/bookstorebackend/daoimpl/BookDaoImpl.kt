@@ -17,7 +17,8 @@ class BookDaoImpl(val repo: BookRepository, val esRepo: BookESRepository) : Book
 
     @Cacheable("book-all")
     override fun findAll(): List<Book> {
-        val ret = esRepo.findAll().toList()
+        // val ret = esRepo.findAll().toList()
+        val ret = repo.findAll().toList()
         println("from esRepo: $ret")
         return ret
     }
@@ -26,18 +27,24 @@ class BookDaoImpl(val repo: BookRepository, val esRepo: BookESRepository) : Book
     override fun getTypes(): List<String> = repo.getTypes()
 
     @Cacheable("book-type")
-    override fun getBooksByType(type: String) = esRepo.findByType(type)
+    // override fun getBooksByType(type: String) = esRepo.findByType(type)
+    override fun getBooksByType(type: String) = repo.getBooksByType(type)
 
-    override fun getBooksByName(name: String) = esRepo.findByName(name)
+    // override fun getBooksByName(name: String) = esRepo.findByName(name)
+    override fun getBooksByName(name: String) = repo.getBooksByName(name)
 
-    override fun getBooksByNameContaining(name: String) = esRepo.findByNameContaining(name)
+    // override fun getBooksByNameContaining(name: String) = esRepo.findByNameContaining(name)
+    override fun getBooksByNameContaining(name: String) = repo.getBooksByNameContaining(name)
 
-    override fun getBooksByAuthorContaining(author: String) = esRepo.findByAuthorContaining(author)
+    // override fun getBooksByAuthorContaining(author: String) = esRepo.findByAuthorContaining(author)
+    override fun getBooksByAuthorContaining(author: String) = repo.getBooksByAuthorContaining(author)
 
-    override fun getBooksByDescriptionContaining(description: String) = esRepo.findByDescriptionContaining(description)
+    // override fun getBooksByDescriptionContaining(description: String) = esRepo.findByDescriptionContaining(description)
+    override fun getBooksByDescriptionContaining(description: String) = repo.getBooksByDescriptionContaining(description)
 
     @Cacheable("book-id")
-    override fun getBookById(id: Int?): Book? = esRepo.findById(id!!).get()
+    // override fun getBookById(id: Int?): Book? = esRepo.findById(id!!).get()
+    override fun getBookById(id: Int?) = repo.getBookById(id)
 
     @Transactional(Transactional.TxType.REQUIRED)
     @Caching(
@@ -49,7 +56,7 @@ class BookDaoImpl(val repo: BookRepository, val esRepo: BookESRepository) : Book
         ]
     )
     override fun save(book: Book): Book {
-        esRepo.save(book)
+        // esRepo.save(book)
         return repo.save(book)
     }
 
@@ -62,7 +69,7 @@ class BookDaoImpl(val repo: BookRepository, val esRepo: BookESRepository) : Book
         ]
     )
     override fun deleteById(id: Int) {
-        esRepo.deleteById(id)
+        // esRepo.deleteById(id)
         return repo.deleteById(id)
     }
 }

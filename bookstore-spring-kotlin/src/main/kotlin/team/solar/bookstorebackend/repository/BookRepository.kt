@@ -13,6 +13,8 @@ interface BookRepository : JpaRepository<Book, Int>, JpaSpecificationExecutor<Bo
 
     fun getBooksByType(type: String): List<Book>
 
+    fun getBooksByName(name: String): List<Book>
+
     fun getBooksByNameContaining(name: String): List<Book>
 
     fun getBooksByAuthorContaining(author: String): List<Book>

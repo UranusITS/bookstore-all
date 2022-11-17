@@ -140,7 +140,10 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
         val user = getLocalUser()
         if (user != null) {
             val cartItems = getCartItems(user)
-            var newPriceTotal = getCartPrice(cartItems)
+            console.log("fetch items:")
+            console.log(cartItems)
+            val newPriceTotal = getCartPrice(cartItems)
+            console.log("price total: $newPriceTotal")
             /**
             var newPriceTotal = .0
             for (cartItem in cartItems) {
@@ -164,6 +167,7 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
     }
 
     override fun RBuilder.render() {
+        console.log("current state: $state")
         content {
             attrs.style = js {
                 width = 1080.px
@@ -171,6 +175,8 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
             }
             row {
                 attrs.gutter = 24
+                console.log("cartItemList from state:")
+                console.log(state.cartItemList)
                 for (item in state.cartItemList) {
                     console.log(item)
                     col {
@@ -301,7 +307,7 @@ class CartComponent(props: Props) : RComponent<Props, CartState>(props) {
                     attrs.style = js {
                         width = 240
                         margin = "auto"
-                    } as String
+                    }
                     space {
                         attrs.direction = "vertical"
                         attrs.size = 20
