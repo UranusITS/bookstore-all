@@ -15,11 +15,8 @@ import antd.space.space
 import data.HeaderState
 import data.*
 import kotlinext.js.js
-import kotlinx.browser.localStorage
 import kotlinx.browser.window
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.html.style
 import org.w3c.dom.HTMLInputElement
 import org.w3c.fetch.INCLUDE
@@ -30,9 +27,12 @@ import react.dom.a
 import react.dom.div
 import react.dom.img
 import react.router.dom.Link
+import web.storage.localStorage
 
 
 class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
+    private val coroutineScope = MainScope()
+
     init {
         state = HeaderState(
             User(-1, "", "", -1),
@@ -43,7 +43,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
         )
     }
 
-    private fun buildMenu(is_admin: Boolean): ReactElement<*> {
+    private fun buildMenu(isAdmin: Boolean): ReactElement<*> {
         val menu = buildElement {
             menu {
                 menuItem {
@@ -60,7 +60,7 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
                         +"购物车"
                     }
                 }
-                if (is_admin) {
+                if (isAdmin) {
                     menuItem {
                         attrs.disabled = false
                         Link {
@@ -152,12 +152,12 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
     }
 
     private fun logout() {
-        GlobalScope.launch {
+        coroutineScope.launch {
             val username = state.user.username
             val response =
                 window.fetch(
                     "$backendUrl/user/logout?username=${username}",
-                    RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
+                    RequestInit(credentials = RequestCredentials.INCLUDE)
                 )
                     .await()
                     .text()
@@ -168,11 +168,9 @@ class HeaderComponent(props: Props) : RComponent<Props, HeaderState>(props) {
             seconds %= 60
             if (hours > 0) {
                 message.success("退出登录成功，总登录时长${hours}时${minutes}分${seconds}秒")
-            }
-            else if (minutes > 0) {
+            } else if (minutes > 0) {
                 message.success("退出登录成功，总登录时长${minutes}分${seconds}秒")
-            }
-            else {
+            } else {
                 message.success("退出登录成功，总登录时长${seconds}秒")
             }
         }

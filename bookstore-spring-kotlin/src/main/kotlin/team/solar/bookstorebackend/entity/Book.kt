@@ -1,14 +1,18 @@
 package team.solar.bookstorebackend.entity
 
-import org.springframework.data.elasticsearch.annotations.*
+import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.FieldType
+import org.springframework.data.mongodb.core.mapping.MongoId
 import javax.persistence.*
 
 @Entity
 @Table(name = "books")
+@Document("books")
 // @Document(indexName = "book", indexStoreType = "book")
 class Book(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
+    @MongoId(FieldType.INT32)
     @Id val id: Int? = null,
     // @Field(type = FieldType.Keyword)
     val isbn: String? = null,

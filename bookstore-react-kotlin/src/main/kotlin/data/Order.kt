@@ -1,15 +1,16 @@
 package data
 
-import kotlinx.browser.window
+import kotlinext.js.js
 import kotlinx.coroutines.await
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.w3c.fetch.Headers
-import org.w3c.fetch.RequestInit
 import react.Props
 import react.State
+import web.http.fetch
+import web.http.fetchAsync
+import web.http.RequestInit
 
 
 @Serializable
@@ -25,7 +26,7 @@ data class OrderState(
     var address: Address?,
     var orderItems: List<OrderItem>,
     var isModalVisible: Boolean
-): State
+) : State
 
 data class OrderAdminState(
     var id: Int,
@@ -33,47 +34,44 @@ data class OrderAdminState(
     var address: Address?,
     var orderItems: List<OrderItem>,
     var isModalVisible: Boolean
-): State
+) : State
 
 external interface OrderProps : Props {
     var id: Int
 }
 
 
-data class OrderListState(var orderList: List<Order>): State
+data class OrderListState(var orderList: List<Order>) : State
 
 suspend fun getOrderById(id: Int): Order? {
-    val response = window.fetch("$backendUrl/order/order?id=$id")
-        .await()
-        .text()
-        .await()
-    return Json.decodeFromString(response)
+    return Json.decodeFromString(fetchAsync(
+        "$backendUrl/order/order?id=$id",
+        js { credentials = INCLUDE } as RequestInit
+    ).await().text().await())
 }
 
 suspend fun addOrder(order: Order) {
-    val headers = Headers()
-    headers.append("Content-Type", "application/json;charset=UTF-8")
-    window.fetch(
+    fetch(
         "$backendUrl/order/add-order",
-        RequestInit(method = "POST", headers = headers, body = Json.encodeToString(order))
+        js {
+            credentials = "include"
+            method = "post"
+            headers = arrayOf(arrayOf("Content-Type", "application/json;charset=UTF-8"))
+            body = Json.encodeToString(order)
+        } as RequestInit
     )
-        .await()
-        .text()
-        .await()
 }
 
 suspend fun getAllOrders(): List<Order> {
-    val response = window.fetch("$backendUrl/order/all-orders")
-        .await()
-        .text()
-        .await()
-    return Json.decodeFromString(response)
+    return Json.decodeFromString(fetchAsync(
+        "$backendUrl/order/all-orders",
+        js { credentials = INCLUDE } as RequestInit
+    ).await().text().await())
 }
 
 suspend fun getOrdersByUser(user: User): List<Order> {
-    val response = window.fetch("$backendUrl/order/orders?user-id=${user.id}")
-        .await()
-        .text()
-        .await()
-    return Json.decodeFromString(response)
+    return Json.decodeFromString(fetchAsync(
+        "$backendUrl/order/orders?user-id=${user.id}",
+        js { credentials = INCLUDE } as RequestInit
+    ).await().text().await())
 }

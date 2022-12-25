@@ -7,7 +7,6 @@ import data.Book
 import data.BookProps
 import data.getBookById
 import kotlinext.js.js
-import kotlinx.browser.localStorage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.js.get
@@ -18,6 +17,7 @@ import react.useState
 import style.BookDetailStyles
 import styled.css
 import styled.styledDiv
+import web.storage.localStorage
 
 val bookEditPage = fc<BookProps> { props ->
     val params = useParams()

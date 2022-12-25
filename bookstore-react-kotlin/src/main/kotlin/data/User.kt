@@ -1,17 +1,16 @@
 package data
 
-import kotlinx.browser.localStorage
-import kotlinx.browser.window
+import kotlinext.js.js
 import kotlinx.coroutines.await
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.w3c.fetch.INCLUDE
-import org.w3c.fetch.RequestCredentials
-import org.w3c.fetch.RequestInit
 import react.Props
 import react.State
+import web.http.fetchAsync
+import web.http.RequestInit
+import web.storage.localStorage
 
 
 @Serializable
@@ -54,37 +53,23 @@ fun setLocalUser(user: User?) {
 }
 
 suspend fun getAllUsers(): List<User> {
-    val response = window.fetch(
-        "$backendUrl/user/users",
-        RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
+    return Json.decodeFromString(
+        fetchAsync(
+            "$backendUrl/user/users",
+            js { credentials = INCLUDE } as RequestInit
+        ).await().text().await()
     )
-        .await()
-        .text()
-        .await()
-    return Json.decodeFromString(response)
 }
 
 suspend fun deleteUserById(id: Int) {
-    window.fetch(
-        "$backendUrl/user/delete?id=$id",
-        RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
-    )
-        .await()
-        .text()
-        .await()
+    fetchAsync("$backendUrl/user/delete?id=$id", js { credentials = INCLUDE } as RequestInit).await()
 }
 
 suspend fun checkLogin(username: String, password: String): User? {
-    val response =
-        window.fetch(
-            "$backendUrl/user/login?username=${username}&password=${password}",
-            RequestInit(credentials = RequestCredentials.INCLUDE)
-        )
-            .await()
-            .text()
-            .await()
-    val user = Json.decodeFromString<User>(response)
-    return if (user.id != -1) user else null
+    return Json.decodeFromString(fetchAsync(
+        "$backendUrl/user/login?username=$username&password=$password",
+        js { credentials = INCLUDE } as RequestInit
+    ).await().text().await())
 }
 
 suspend fun checkRegister(username: String, password: String): User? {
@@ -94,14 +79,9 @@ suspend fun checkRegister(username: String, password: String): User? {
     if (password.length < 6) {
         return null
     }
-    val response =
-        window.fetch(
-            "$backendUrl/user/register?username=${username}&password=${password}",
-            RequestInit(credentials = RequestCredentials.Companion.INCLUDE)
-        )
-            .await()
-            .text()
-            .await()
-    val user = Json.decodeFromString<User>(response)
+    val user = Json.decodeFromString<User>(fetchAsync(
+        "$backendUrl/user/register?username=${username}&password=${password}",
+        js { credentials = INCLUDE } as RequestInit
+    ).await().text().await())
     return if (user.id != -1) user else null
 }

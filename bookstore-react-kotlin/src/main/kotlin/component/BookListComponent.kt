@@ -11,6 +11,7 @@ import antd.menu.menu
 import antd.menu.menuItem
 import antd.menu.subMenu
 import data.*
+import kotlinext.js.js
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import react.*
@@ -74,13 +75,13 @@ class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) 
 
     override fun RBuilder.render() {
         content {
-            attrs.style = kotlinext.js.js {
+            attrs.style = js {
                 width = 1280
                 margin = "72px auto"
             }
             search {
                 attrs {
-                    style = kotlinext.js.js { marginTop = 24 }
+                    style = js { marginTop = 24 }
                     placeholder = "输入书名，作者名，......"
                     enterButton = true
                     size = "large"
@@ -102,7 +103,7 @@ class BookListComponent(props: Props) : RComponent<Props, BookListState>(props) 
             SaleCarousel { attrs.sales = state.sales }
             layout {
                 sider {
-                    attrs.style = kotlinext.js.js {
+                    attrs.style = js {
                         background = "rgb(240, 242, 245)"
                     }
                     menu {

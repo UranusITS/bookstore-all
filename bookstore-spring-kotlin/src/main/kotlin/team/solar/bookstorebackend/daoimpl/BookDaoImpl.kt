@@ -8,12 +8,14 @@ import org.springframework.stereotype.Repository
 import team.solar.bookstorebackend.dao.BookDao
 import team.solar.bookstorebackend.entity.Book
 import team.solar.bookstorebackend.esrepository.BookESRepository
+import team.solar.bookstorebackend.mgrepository.BookMGRepository
 import team.solar.bookstorebackend.repository.BookRepository
 import java.util.*
 import javax.transaction.Transactional
 
 @Repository
-class BookDaoImpl(val repo: BookRepository, val esRepo: BookESRepository) : BookDao {
+// class BookDaoImpl(val repo: BookRepository, val esRepo: BookESRepository) : BookDao {
+class BookDaoImpl(val repo: BookMGRepository) : BookDao {
 
     @Cacheable("book-all")
     override fun findAll(): List<Book> {
@@ -24,7 +26,16 @@ class BookDaoImpl(val repo: BookRepository, val esRepo: BookESRepository) : Book
     }
 
     @Cacheable("book-all-types")
-    override fun getTypes(): List<String> = repo.getTypes()
+    override fun getTypes(): List<String> {
+        val books = repo.findAll().toList()
+        val ret = mutableListOf<String>()
+        for (book in books) {
+            if (!ret.contains(book.type)) {
+                book.type?.let { ret.add(it) }
+            }
+        }
+        return ret
+    }
 
     @Cacheable("book-type")
     // override fun getBooksByType(type: String) = esRepo.findByType(type)

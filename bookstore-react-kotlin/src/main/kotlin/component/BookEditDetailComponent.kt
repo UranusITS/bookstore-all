@@ -11,7 +11,6 @@ import antd.message.message
 import antd.space.space
 import data.*
 import kotlinext.js.js
-import kotlinx.browser.localStorage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.css.*
@@ -22,6 +21,7 @@ import style.BookDetailStyles
 import styled.css
 import styled.styledDiv
 import styled.styledSpan
+import web.storage.localStorage
 
 
 class BookEditDetailComponent(props: Props) : RComponent<Props, BookState>(props) {
